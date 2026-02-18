@@ -2,617 +2,522 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>رمضاني برو | Ramadanly Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفيق رمضان - تجربة روحانية</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.1/Adhan.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-hijri/2.1.2/moment-hijri.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    colors: {
+                        gold: '#D4AF37',
+                        ramadan: '#099999',
+                    },
+                    animation: {
+                        'breathe': 'breathe 4s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        breathe: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.02)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        :root {
-            --primary: #099999;
-            --primary-dark: #067a7a;
-            --accent: #D4AF37;
-            --bg-body: #f8f9fa;
-            --text-dark: #2d3748;
-            --text-light: #718096;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            
-            /* ألوان الحالات */
-            --st-free-bg: #edf2f7; --st-free-text: #718096;
-            --st-guest-bg: #fffaf0; --st-guest-border: #ed8936; --st-guest-text: #c05621;
-            --st-host-bg: #f0fff4; --st-host-border: #48bb78; --st-host-text: #2f855a;
-        }
-
-        body.dark-mode {
-            --bg-body: #1a202c;
-            --text-dark: #f7fafc;
-            --card-bg: #2d3748;
-            --border-color: #4a5568;
-            --st-free-bg: #4a5568; --st-free-text: #cbd5e0;
-            --st-guest-bg: #2c2118; --st-guest-text: #f6ad55;
-            --st-host-bg: #1c3325; --st-host-text: #68d391;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* Mood Engine Backgrounds */
+        body { transition: background 1.5s ease-in-out, color 1s; }
         
-        body { 
-            margin: 0; 
-            font-family: 'Tajawal', sans-serif; 
-            background-color: var(--bg-body);
-            color: var(--text-dark); 
-            padding-bottom: 100px; 
-            transition: background 0.3s;
-            overflow-x: hidden;
+        .mood-morning { background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%); color: #006064; }
+        .mood-work { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #2d3748; }
+        .mood-golden { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #742a2a; } /* قبل المغرب */
+        .mood-night { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); color: #e2e8f0; }
+
+        /* Glassmorphism Logic */
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+        }
+        .mood-night .glass {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* --- زخرفة رمضانية (للابتوب فقط) --- */
-        @media (min-width: 1024px) {
-            body {
-                background-image: 
-                    radial-gradient(var(--primary) 1px, transparent 1px), 
-                    radial-gradient(var(--primary) 1px, transparent 1px);
-                background-size: 40px 40px;
-                background-position: 0 0, 20px 20px;
-                background-color: #f0fdfd; /* لون خلفية فاتح جداً */
-            }
-            body.dark-mode {
-                background-color: #111827;
-                background-image: 
-                    radial-gradient(#2d3748 1px, transparent 1px), 
-                    radial-gradient(#2d3748 1px, transparent 1px);
-            }
-            
-            /* تعديل الهيكل للابتوب */
-            .main-layout {
-                display: flex;
-                max-width: 1200px;
-                margin: 40px auto;
-                gap: 30px;
-                align-items: flex-start;
-            }
-            .sidebar-area { width: 300px; flex-shrink: 0; }
-            .content-area { flex-grow: 1; }
-            
-            /* الفانوس */
-            .lantern-decoration {
-                display: block !important;
-                position: fixed; top: -20px; left: 50px;
-                font-size: 8rem; color: var(--accent);
-                animation: swing 3s infinite ease-in-out;
-                z-index: 5; text-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            }
+        /* Fasting Ring */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
         }
 
-        @keyframes swing { 0% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
-        .lantern-decoration { display: none; } /* مخفي عالموبايل */
-
-        /* --- الهيدر --- */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 20px;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            box-shadow: 0 4px 15px rgba(9,153,153,0.3);
-            position: relative; z-index: 50;
-        }
-        .header-content { display: flex; justify-content: space-between; align-items: center; }
-        .app-title h1 { font-weight: 800; font-size: 1.4rem; margin: 0; }
-        .app-title p { font-size: 0.8rem; margin: 0; opacity: 0.9; }
-
-        /* --- العداد والوقت --- */
-        .time-box {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(5px);
-            padding: 8px 15px; border-radius: 12px;
-            font-size: 0.9rem; font-weight: bold; margin-top: 10px;
-            display: inline-block; border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* --- لوحة التحكم والإحصائيات --- */
-        .dashboard-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-around;
-            text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-        }
-        .stat-item h3 { margin: 0; font-size: 1.5rem; color: var(--primary); }
-        .stat-item span { font-size: 0.8rem; color: var(--text-light); }
-
-        .search-container { position: relative; margin-bottom: 20px; }
-        .search-input {
-            width: 100%; padding: 12px 40px 12px 15px;
-            border-radius: 12px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark);
-            font-family: 'Tajawal'; outline: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
-
-        /* --- التقويم --- */
-        .days-header {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            text-align: center; font-weight: 700; color: var(--primary);
-            margin-bottom: 10px; font-size: 0.8rem;
-            background: var(--card-bg); padding: 10px 0;
-            border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
-        }
-
-        .day-box {
-            aspect-ratio: 1/1;
-            background: var(--card-bg); border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; position: relative;
-            transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .day-box:active { transform: scale(0.95); }
-        .day-box.today { border: 2px solid var(--primary); }
+        /* Hide Scrollbar */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        .day-box.is-guest { background: var(--st-guest-bg); border-color: var(--st-guest-border); color: var(--st-guest-text); }
-        .day-box.is-host { background: var(--st-host-bg); border-color: var(--st-host-border); color: var(--st-host-text); }
-
-        .day-num { font-weight: 800; font-size: 1rem; margin-bottom: 2px; }
-        .day-label { 
-            font-size: 0.65rem; text-align: center; line-height: 1.2; 
-            width: 90%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; 
-        }
-
-        /* --- أزرار العائمة (FAB) --- */
-        .fab-container {
-            position: fixed; bottom: 25px; left: 25px; 
-            display: flex; flex-direction: column; gap: 12px; z-index: 100;
-        }
-        .fab-btn {
-            width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.2rem; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid white;
-        }
-        .fab-main { background: var(--accent); width: 60px; height: 60px; font-size: 1.5rem; }
-        .fab-sub { background: var(--primary); }
-        .fab-whatsapp { background: #25D366; }
-
-        /* --- القوائم والمودال --- */
-        .side-menu {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--card-bg); z-index: 300; padding: 30px 20px;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.1); transition: 0.3s;
-        }
-        .side-menu.open { right: 0; }
-        
-        .menu-item {
-            padding: 15px 0; border-bottom: 1px solid var(--border-color);
-            display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-dark);
-        }
-        .menu-item:hover { color: var(--primary); }
-
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200;
-            display: none; align-items: flex-end; justify-content: center;
-            backdrop-filter: blur(3px);
-        }
-        .modal-overlay.active { display: flex; }
-        
-        .modal-sheet {
-            background: var(--card-bg); width: 100%; max-width: 500px;
-            border-top-left-radius: 25px; border-top-right-radius: 25px;
-            padding: 25px; max-height: 90vh; overflow-y: auto;
-            animation: slideUp 0.3s;
-        }
-        @keyframes slideUp { from {transform: translateY(100%)} to {transform: translateY(0)} }
-        @media (min-width: 600px) { .modal-sheet { border-radius: 20px; align-self: center; } }
-
-        /* --- عناصر النموذج --- */
-        .form-label { font-weight: bold; margin-bottom: 8px; display: block; font-size: 0.9rem; }
-        .custom-input {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);
-            background: var(--bg-body); color: var(--text-dark); outline: none; font-family: 'Tajawal';
-        }
-        .status-toggle { display: flex; background: var(--bg-body); padding: 5px; border-radius: 12px; gap: 5px; margin-bottom: 15px; }
-        .st-btn {
-            flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; 
-            font-weight: bold; color: var(--text-light); cursor: pointer;
-        }
-        .st-btn.active-free { background: var(--card-bg); color: var(--text-dark); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .st-btn.active-guest { background: #fffaf0; color: #c05621; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .st-btn.active-host { background: #f0fff4; color: #2f855a; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        .btn-save {
-            width: 100%; padding: 15px; background: var(--primary); color: white;
-            border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem;
-            margin-top: 15px; cursor: pointer;
-        }
-
-        /* --- ستايل خاص عند الطباعة/التصدير --- */
-        body.export-mode {
-            background: white !important;
-            width: 800px !important; /* عرض ثابت للصورة */
-            margin: 0 auto !important;
-        }
-        body.export-mode .fab-container,
-        body.export-mode .header-actions,
-        body.export-mode .search-container,
-        body.export-mode .side-menu,
-        body.export-mode .modal-overlay,
-        body.export-mode .lantern-decoration {
-            display: none !important;
-        }
-        body.export-mode .calendar-grid {
-            grid-template-columns: repeat(7, 1fr) !important;
-            gap: 10px !important;
-        }
-        body.export-mode .day-box {
-            border: 1px solid #ddd !important;
-            box-shadow: none !important;
-            aspect-ratio: 1.2/1 !important; /* جعل الخلايا أعرض قليلاً في الصورة */
-        }
-        body.export-mode .day-label {
-            font-size: 0.8rem !important;
-            white-space: normal !important;
-        }
-
+        .hidden-panel { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.5s ease; }
+        .visible-panel { max-height: 500px; opacity: 1; margin-top: 1rem; }
     </style>
 </head>
-<body>
+<body id="appBody" class="mood-morning min-h-screen flex items-center justify-center p-4 overflow-hidden">
 
-    <div class="lantern-decoration"><i class="fas fa-mosque"></i></div>
+    <audio id="ambientAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=night-ambience-17064.mp3" type="audio/mp3">
+    </audio>
 
-    <div class="main-layout">
+    <div class="w-full max-w-lg flex flex-col gap-6 relative z-10">
         
-        <div class="sidebar-area">
-            <header>
-                <div class="header-content">
-                    <div class="app-title">
-                        <h1>رمضاني برو 🌙</h1>
-                        <p>اهلا فيك</p>
-                    </div>
-                    <div class="header-actions" onclick="toggleMenu()" style="font-size:1.3rem; cursor:pointer">
-                        <i class="fas fa-bars"></i>
-                    </div>
-                </div>
-                <div class="time-box" id="countdownTimer">--:--:--</div>
-            </header>
+        <header class="text-center opacity-80 animate-float">
+            <h2 class="text-3xl font-bold tracking-wide" id="hijriDateDisplay">-- رمضان 1447</h2>
+            <p class="text-sm mt-1 font-light opacity-90" id="gregorianDateDisplay">--</p>
+        </header>
 
-            <div style="padding: 20px;">
-                <div class="dashboard-card">
-                    <div class="stat-item">
-                        <h3 id="totalHost">0</h3>
-                        <span>عازم</span>
-                    </div>
-                    <div style="width:1px; background:var(--border-color)"></div>
-                    <div class="stat-item">
-                        <h3 id="totalGuest">0</h3>
-                        <span>معزوم</span>
-                    </div>
-                    <div style="width:1px; background:var(--border-color)"></div>
-                    <div class="stat-item">
-                        <h3 id="totalCost" style="color:var(--accent)">0</h3>
-                        <span>التكلفة</span>
-                    </div>
-                </div>
+        <div class="glass p-8 flex flex-col items-center justify-center relative shadow-2xl animate-breathe">
+            
+            <button onclick="toggleFocus()" id="focusBtn" class="absolute top-4 right-4 opacity-50 hover:opacity-100 transition" title="وضع التركيز">
+                <i class="fas fa-wind text-xl"></i>
+            </button>
 
-                <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن عزومة..." onkeyup="renderCalendar()">
-                    <i class="fas fa-search search-icon"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="content-area">
-            <div style="padding: 0 20px;">
-                <div class="days-header">
-                    <div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div><div>الأحد</div><div>الاثنين</div><div>الثلاثاء</div>
-                </div>
-
-                <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="relative w-64 h-64 mb-4">
+                <svg class="w-full h-full drop-shadow-lg" viewBox="0 0 100 100">
+                    <circle class="stroke-current opacity-20" stroke-width="6" cx="50" cy="50" r="45" fill="transparent"></circle>
+                    <circle id="fastingCircle" class="stroke-current transition-all duration-1000" stroke-width="6" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dasharray="283" stroke-dashoffset="283"></circle>
+                </svg>
                 
-                <div style="text-align: center; margin-top: 30px; font-size: 0.8rem; color: var(--text-light); opacity: 0.7;">
-رمضان مبارك                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="fab-container">
-        <div class="fab-btn fab-sub" onclick="toggleDarkMode()" title="الوضع الليلي">
-            <i class="fas fa-moon"></i>
-        </div>
-        <div class="fab-btn fab-whatsapp" onclick="shareWhatsApp()" title="مشاركة واتساب">
-            <i class="fab fa-whatsapp"></i>
-        </div>
-        <div class="fab-btn fab-main" onclick="openModal()" title="إضافة">
-            <i class="fas fa-plus"></i>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="menuOverlay" onclick="toggleMenu()" style="z-index: 290;"></div>
-    <div class="side-menu" id="sideMenu">
-        <h2 style="color:var(--primary); margin-top:0;">الإعدادات</h2>
-        
-        <div class="menu-item" onclick="exportImage()">
-            <i class="fas fa-image" style="color:var(--primary)"></i> حفظ الجدول كصورة (نظيفة)
-        </div>
-        <div class="menu-item" onclick="suggestFood()">
-            <i class="fas fa-dice" style="color:var(--primary)"></i> شو أطبخ اليوم؟
-        </div>
-        <div class="menu-item" onclick="exportBackup()">
-            <i class="fas fa-file-export" style="color:var(--primary)"></i> حفظ نسخة احتياطية
-        </div>
-        <div class="menu-item" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-file-import" style="color:var(--primary)"></i> استرجاع نسخة
-            <input type="file" id="fileInput" hidden onchange="importBackup(this)">
-        </div>
-        <div class="menu-item" onclick="resetData()" style="color: #e53e3e;">
-            <i class="fas fa-trash"></i> تصفير الجدول
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="inputModal">
-        <div class="modal-sheet">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; color:var(--primary)">تفاصيل العزومة</h2>
-                <div onclick="closeModal('inputModal')" style="cursor:pointer; padding:5px;">&times;</div>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label class="form-label">التاريخ</label>
-                <select id="daySelect" class="custom-input" onchange="loadDayData()"></select>
-            </div>
-
-            <label class="form-label">الحالة</label>
-            <div class="status-toggle">
-                <button class="st-btn active-free" onclick="setStatus('free')" id="btnFree">فاضي</button>
-                <button class="st-btn" onclick="setStatus('guest')" id="btnGuest">معزوم</button>
-                <button class="st-btn" onclick="setStatus('host')" id="btnHost">عازم</button>
-            </div>
-
-            <div id="detailsSection" style="display:none;">
-                <div style="margin-bottom: 15px;">
-                    <label class="form-label" id="lblWho">الاسم</label>
-                    <input type="text" id="inpWho" class="custom-input" list="contactsList" placeholder="عند مين / مين جاي؟">
-                    <datalist id="contactsList">
-                        <option value="بيت حماي"><option value="بيت أهلي"><option value="خالي محمد"><option value="الشباب">
-                    </datalist>
-                </div>
-                
-                <div style="display:flex; gap:10px; margin-bottom: 15px;">
-                    <div style="flex:2">
-                        <label class="form-label">الأكل</label>
-                        <input type="text" id="inpFood" class="custom-input" placeholder="منسف..">
-                    </div>
-                    <div style="flex:1">
-                        <label class="form-label">أيقونة</label>
-                        <select id="inpIcon" class="custom-input">
-                            <option value="fa-utensils">🍴</option>
-                            <option value="fa-coffee">☕</option>
-                            <option value="fa-drumstick-bite">🍗</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="costGroup" style="margin-bottom: 15px; display:none;">
-                    <label class="form-label">التكلفة (دينار)</label>
-                    <input type="number" id="inpCost" class="custom-input" placeholder="0">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span id="prayerLabel" class="text-sm uppercase tracking-widest opacity-70 mb-1">المتبقي للإفطار</span>
+                    <span id="mainCountdown" class="text-5xl font-extrabold tracking-tighter tabular-nums">--:--</span>
+                    <span id="fastingPercent" class="text-sm mt-2 font-medium bg-white/20 px-2 py-0.5 rounded-full">0%</span>
                 </div>
             </div>
 
-            <button class="btn-save" onclick="saveData()">حفظ يا كبير</button>
+            <p id="moodMessage" class="text-center text-lg font-medium opacity-90 px-4">
+                "اللهم إني لك صمت..."
+            </p>
         </div>
+
+        <div id="contextWidget" class="glass p-5 shadow-lg transition-all duration-500">
+            </div>
+
+        <div class="flex justify-between items-center px-4 opacity-80">
+            <button onclick="togglePrayerGrid()" class="flex items-center gap-2 hover:font-bold transition">
+                <i class="fas fa-calendar-alt"></i> مواقيت الصلاة
+            </button>
+            <div id="miniNextPrayer" class="text-sm font-mono"></div>
+        </div>
+
+        <div id="prayerGrid" class="glass p-4 hidden-panel text-center">
+            <h3 class="text-sm font-bold mb-3 opacity-70">جدول صلوات اليوم - عمان</h3>
+            <div id="prayerTimesList" class="grid grid-cols-3 gap-3 text-sm"></div>
+        </div>
+
     </div>
 
-    <div class="modal-overlay" id="foodModal">
-        <div class="modal-sheet" style="text-align:center;">
-            <h3>شو رأيك تطبخ:</h3>
-            <h1 style="color:var(--primary); font-size:2.2rem; margin:20px 0;" id="suggestedDish">منسف</h1>
-            <button class="btn-save" onclick="suggestFood()">اقتراح ثاني</button>
-            <button class="st-btn" onclick="closeModal('foodModal')" style="margin-top:10px;">سكر</button>
-        </div>
+    <div id="toast" class="fixed bottom-10 bg-white/90 text-gray-800 px-6 py-3 rounded-full shadow-2xl transform translate-y-24 transition-transform duration-500 font-bold z-50 flex items-center gap-3 backdrop-blur-sm">
+        <i class="fas fa-bell text-gold"></i>
+        <span id="toastMsg">رسالة</span>
     </div>
 
     <script>
-        const TOTAL_DAYS = 30;
-        const START_DATE = new Date(2026, 1, 18); // 18 Feb 2026
-        let schedule = JSON.parse(localStorage.getItem('ramadanly_basel_v3')) || {};
-        let currentStatus = 'free';
+        // --- Configuration & State ---
+        const CONFIG = {
+            coordinates: new adhan.Coordinates(31.9454, 35.9284), // Amman
+            params: adhan.CalculationMethod.Jordan(),
+            ramadanStart: new Date('2026-02-19T00:00:00'), // تاريخ بداية رمضان
+            quranTotalPages: 604
+        };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCalendar();
-            populateDaySelect();
-            updateDashboard();
-            startClock();
-            if(localStorage.getItem('ramadanly_dark') === 'true') document.body.classList.add('dark-mode');
-        });
+        let state = {
+            theme: 'morning', // morning, work, golden, night
+            isWorkTime: false,
+            focusMode: false,
+            audioContext: null,
+            whiteNoise: null,
+            lastOut: 0 // For noise generation
+        };
 
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            grid.innerHTML = '';
+        // --- Core Logic ---
+
+        function init() {
+            updateTimeLoop();
+            setInterval(updateTimeLoop, 1000);
+            renderContextWidget(); // First render
+        }
+
+        function updateTimeLoop() {
+            const now = new Date();
             
-            let today = new Date();
-            let todayKey = `${today.getDate()}-${today.getMonth()}`;
+            // 1. Prayer Times Calculation
+            const prayerTimes = new adhan.PrayerTimes(CONFIG.coordinates, now, CONFIG.params);
+            const nextPrayer = prayerTimes.nextPrayer(); 
+            const nextPrayerTime = prayerTimes.timeForPrayer(nextPrayer);
+            
+            // Imsak manual calculation (Fajr - 10 mins)
+            const imsakTime = new Date(prayerTimes.fajr);
+            imsakTime.setMinutes(imsakTime.getMinutes() - 10);
 
-            for (let i = 0; i < TOTAL_DAYS; i++) {
-                let date = new Date(START_DATE);
-                date.setDate(START_DATE.getDate() + i);
-                
-                let data = schedule[i] || { status: 'free' };
-                let searchText = `${getStatusText(data.status)} ${data.who} ${data.food}`.toLowerCase();
-                
-                if (searchVal && !searchText.includes(searchVal)) continue;
+            // 2. Dates
+            document.getElementById('gregorianDateDisplay').innerText = now.toLocaleDateString('ar-JO', {weekday:'long', day:'numeric', month:'long'});
+            // Simple Hijri approximation for display (Use library for precision if needed)
+            const daysSinceStart = Math.floor((now - CONFIG.ramadanStart) / (1000 * 60 * 60 * 24)) + 1;
+            const ramadanDay = daysSinceStart > 0 ? daysSinceStart : 1;
+            document.getElementById('hijriDateDisplay').innerText = `${ramadanDay} رمضان 1447`;
 
-                let isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth();
-                
-                let div = document.createElement('div');
-                div.className = `day-box ${isToday ? 'today' : ''}`;
-                if (data.status !== 'free') div.classList.add(`is-${data.status}`);
-                
-                div.onclick = () => openModal(i);
-                
-                let icon = data.icon || 'fa-utensils';
-                
-                div.innerHTML = `
-                    <div class="day-num">${i + 1}</div>
-                    ${data.status !== 'free' ? 
-                        `<i class="fas ${icon}" style="font-size:0.8rem; margin-bottom:2px"></i><div class="day-label">${data.who}</div>` : 
-                        `<div class="day-label" style="opacity:0.2">.</div>`
-                    }
-                `;
-                grid.appendChild(div);
-            }
-        }
+            // 3. The Hero Countdown & Ring
+            let targetTime, label, startRange, endRange;
+            let isFasting = false;
 
-        // --- وظيفة تصدير الصورة المحسنة ---
-        function exportImage() {
-            // 1. إغلاق القوائم أولاً
-            document.getElementById('sideMenu').classList.remove('open');
-            document.getElementById('menuOverlay').classList.remove('active');
-
-            // 2. تفعيل وضع التصدير (يخفي الأزرار ويضبط الخلفية)
-            document.body.classList.add('export-mode');
-
-            // 3. انتظار بسيط لتطبيق الستايل ثم التصوير
-            setTimeout(() => {
-                html2canvas(document.body, {
-                    scrollY: -window.scrollY,
-                    scale: 2, // جودة عالية
-                    backgroundColor: "#ffffff" // خلفية بيضاء قسرية
-                }).then(canvas => {
-                    let link = document.createElement('a');
-                    link.download = `جدول_رمضان_باسل.png`;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    
-                    // 4. إزالة وضع التصدير
-                    document.body.classList.remove('export-mode');
-                }).catch(err => {
-                    alert('صار خطأ بسيط بالحفظ سيدي');
-                    document.body.classList.remove('export-mode');
-                });
-            }, 300);
-        }
-
-        // --- باقي الوظائف (نفس المنطق السابق مع تحسينات) ---
-        function openModal(dayIndex = null) {
-            document.getElementById('inputModal').classList.add('active');
-            if (dayIndex !== null) document.getElementById('daySelect').value = dayIndex;
-            loadDayData();
-        }
-
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        function setStatus(status) {
-            currentStatus = status;
-            ['free', 'guest', 'host'].forEach(s => {
-                document.getElementById(`btn${s.charAt(0).toUpperCase() + s.slice(1)}`).className = `st-btn ${status === s ? 'active-'+s : ''}`;
-            });
-            const details = document.getElementById('detailsSection');
-            details.style.display = status === 'free' ? 'none' : 'block';
-            document.getElementById('costGroup').style.display = status === 'host' ? 'block' : 'none';
-            document.getElementById('lblWho').innerText = status === 'guest' ? 'عند مين؟' : 'مين المعازيم؟';
-        }
-
-        function loadDayData() {
-            let index = document.getElementById('daySelect').value;
-            let data = schedule[index] || { status: 'free' };
-            setStatus(data.status);
-            document.getElementById('inpWho').value = data.who || '';
-            document.getElementById('inpFood').value = data.food || '';
-            document.getElementById('inpCost').value = data.cost || '';
-            document.getElementById('inpIcon').value = data.icon || 'fa-utensils';
-        }
-
-        function saveData() {
-            let index = document.getElementById('daySelect').value;
-            schedule[index] = {
-                status: currentStatus,
-                who: currentStatus === 'free' ? '' : document.getElementById('inpWho').value,
-                food: currentStatus === 'free' ? '' : document.getElementById('inpFood').value,
-                cost: (currentStatus === 'host' ? document.getElementById('inpCost').value : 0),
-                icon: document.getElementById('inpIcon').value
-            };
-            localStorage.setItem('ramadanly_basel_v3', JSON.stringify(schedule));
-            updateDashboard();
-            renderCalendar();
-            closeModal('inputModal');
-        }
-
-        function populateDaySelect() {
-            const select = document.getElementById('daySelect');
-            select.innerHTML = '';
-            for (let i = 0; i < TOTAL_DAYS; i++) {
-                let date = new Date(START_DATE);
-                date.setDate(START_DATE.getDate() + i);
-                let dayName = date.toLocaleDateString('ar-JO', { weekday: 'long' }); // الاسم الكامل
-                select.innerHTML += `<option value="${i}">${i + 1} رمضان - ${dayName}</option>`;
-            }
-        }
-        
-        function updateDashboard() {
-            let hosts = 0, guests = 0, cost = 0;
-            Object.values(schedule).forEach(day => {
-                if(day.status === 'host') { hosts++; cost += parseInt(day.cost || 0); }
-                if(day.status === 'guest') guests++;
-            });
-            document.getElementById('totalHost').innerText = hosts;
-            document.getElementById('totalGuest').innerText = guests;
-            document.getElementById('totalCost').innerText = cost;
-        }
-
-        function toggleMenu() {
-            document.getElementById('sideMenu').classList.toggle('open');
-            document.getElementById('menuOverlay').classList.toggle('active');
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('ramadanly_dark', document.body.classList.contains('dark-mode'));
-        }
-
-        function getStatusText(st) { return st==='guest'?'معزوم':(st==='host'?'عازم':'فاضي'); }
-        
-        function startClock() {
-            setInterval(() => {
-                let now = new Date();
-                let iftar = new Date(); iftar.setHours(19, 0, 0);
-                if(now > iftar) document.getElementById('countdownTimer').innerText = "صحتين ❤️";
-                else {
-                    let diff = iftar - now;
-                    let h = Math.floor(diff / 3600000);
-                    let m = Math.floor((diff % 3600000) / 60000);
-                    document.getElementById('countdownTimer').innerText = `المغرب: ${h}:${m}`;
+            if (now < prayerTimes.maghrib && now >= prayerTimes.fajr) {
+                // الصيام
+                isFasting = true;
+                targetTime = prayerTimes.maghrib;
+                label = "المتبقي للإفطار";
+                startRange = prayerTimes.fajr;
+                endRange = prayerTimes.maghrib;
+            } else {
+                // الإفطار
+                isFasting = false;
+                label = "المتبقي للفجر";
+                // Logic to handle "Next Fajr" if it's after Isha
+                if (now > prayerTimes.isha) {
+                     // Next day calculation needed technically, but for visual simplicity we stick to flow
+                     // In a real app, regenerate PrayerTimes for tomorrow
                 }
-            }, 1000);
+                targetTime = prayerTimes.fajr; 
+                // For progress bar at night (optional visual)
+                startRange = prayerTimes.maghrib;
+                endRange = prayerTimes.fajr; // This logic needs next day Fajr for 100% accuracy
+                if (now > prayerTimes.maghrib) endRange.setDate(endRange.getDate() + 1);
+            }
+
+            // Countdown Logic
+            const diff = targetTime - now;
+            if (diff < 0) { 
+                // Case: After Isha, waiting for tomorrow's Fajr (simplified)
+                document.getElementById('mainCountdown').innerText = "00:00:00";
+            } else {
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('mainCountdown').innerText = 
+                    `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+            
+            document.getElementById('prayerLabel').innerText = label;
+
+            // Fasting Ring Progress
+            const totalDuration = endRange - startRange;
+            const elapsed = now - startRange;
+            let percent = (elapsed / totalDuration) * 100;
+            if (percent < 0) percent = 0; if (percent > 100) percent = 100;
+            
+            // If night, maybe reverse the ring or change color? Let's keep it simple: Fill up till Fajr.
+            if (!isFasting) {
+               // In night, maybe show 100% full or different visual. 
+               // Let's make it fill up as "Night Progress"
+            }
+
+            const circle = document.getElementById('fastingCircle');
+            const circumference = 283; 
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            document.getElementById('fastingPercent').innerText = `${Math.round(percent)}%`;
+
+
+            // 4. Mood Engine & Context Logic
+            updateMoodAndContext(now, prayerTimes, isFasting, ramadanDay);
+            
+            // Footer Mini Info
+            const nextPName = nextPrayer === 'none' ? 'الفجر' : prayerNameAR(nextPrayer);
+            document.getElementById('miniNextPrayer').innerHTML = `القادمة: <span class="font-bold text-gold">${nextPName}</span>`;
+
+            // Prayer Grid Populate (Once or update if needed)
+            if(document.getElementById('prayerTimesList').innerHTML === "") {
+                const pNames = {fajr:'الفجر', sunrise:'الشروق', dhuhr:'الظهر', asr:'العصر', maghrib:'المغرب', isha:'العشاء'};
+                let html = '';
+                for (let p in pNames) {
+                    html += `<div class="bg-white/10 p-2 rounded flex flex-col items-center">
+                        <span class="text-xs opacity-70">${pNames[p]}</span>
+                        <span class="font-bold font-mono">${formatTime(prayerTimes[p])}</span>
+                    </div>`;
+                }
+                document.getElementById('prayerTimesList').innerHTML = html;
+            }
         }
 
-        // باقي الوظائف (suggestFood, backup...) يمكن إضافتها هنا بنفس المنطق السابق
-        function suggestFood() {
-             const dishes = ["منسف", "مقلوبة", "مسخن", "كفتة", "أوزي", "دوالي", "ملوخية"];
-             document.getElementById('suggestedDish').innerText = dishes[Math.floor(Math.random()*dishes.length)];
-             document.getElementById('foodModal').classList.add('active');
-             toggleMenu();
+        // --- The Mood Engine & Context Manager ---
+        function updateMoodAndContext(now, pt, isFasting, ramadanDay) {
+            const body = document.getElementById('appBody');
+            const widget = document.getElementById('contextWidget');
+            const msg = document.getElementById('moodMessage');
+            
+            // Work Logic (Sun-Thu, 7:30 - 14:30)
+            const day = now.getDay();
+            const isWorkDay = day >= 0 && day <= 4;
+            const workStart = new Date(now); workStart.setHours(7, 30, 0);
+            const workEnd = new Date(now); workEnd.setHours(14, 30, 0); // 2:30 PM
+            const isWorkHours = isWorkDay && now >= workStart && now <= workEnd;
+            
+            // Determine Mood Phase
+            let currentPhase = 'morning';
+
+            // Golden Hour (1 hour before Maghrib)
+            const timeToMaghrib = pt.maghrib - now;
+            const isGoldenHour = isFasting && timeToMaghrib < (60 * 60 * 1000) && timeToMaghrib > 0;
+
+            if (!isFasting) {
+                currentPhase = 'night';
+            } else if (isGoldenHour) {
+                currentPhase = 'golden';
+            } else if (isWorkHours) {
+                currentPhase = 'work';
+            } else {
+                currentPhase = 'morning';
+            }
+
+            // Apply Theme
+            body.className = `min-h-screen flex items-center justify-center p-4 overflow-hidden mood-${currentPhase}`;
+
+            // --- Render Secondary Widget Content Based on Context ---
+            
+            // SCENARIO 1: WORK (During Work Hours)
+            if (currentPhase === 'work') {
+                const totalWork = workEnd - workStart;
+                const elapsedWork = now - workStart;
+                const workPercent = Math.round((elapsedWork / totalWork) * 100);
+                
+                msg.innerText = "العمل عبادة.. احتسب الأجر";
+                
+                // Check if context changed to prevent redraw flickering
+                if(widget.dataset.context !== 'work') {
+                    widget.dataset.context = 'work';
+                    widget.innerHTML = `
+                        <div class="flex flex-col gap-3">
+                            <div class="flex justify-between items-end">
+                                <h3 class="font-bold text-lg"><i class="fas fa-laptop-code ml-2"></i>جلسة العمل</h3>
+                                <span class="text-xs font-mono bg-black/10 px-2 rounded">ينتهي 2:30</span>
+                            </div>
+                            <div class="w-full bg-gray-300/30 rounded-full h-2 overflow-hidden">
+                                <div class="bg-current h-full transition-all duration-1000" style="width: ${workPercent}%"></div>
+                            </div>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm opacity-80">إنجازك اليوم</span>
+                                <span class="font-bold text-xl">${workPercent}%</span>
+                            </div>
+                            <div class="bg-white/40 p-3 rounded-lg flex items-center gap-3 mt-2">
+                                <input type="checkbox" class="w-5 h-5 accent-current" id="dailyTaskCheck">
+                                <label for="dailyTaskCheck" class="text-sm cursor-pointer select-none line-through-checked">إنهاء أهم 3 مهام قبل الظهر</label>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // SCENARIO 2: GOLDEN HOUR (Pre-Maghrib)
+            else if (currentPhase === 'golden') {
+                msg.innerText = "اقترب الموعد.. كثف الدعاء";
+                if(widget.dataset.context !== 'golden') {
+                    widget.dataset.context = 'golden';
+                    widget.innerHTML = `
+                        <div class="text-center">
+                            <h3 class="font-bold text-xl mb-2">🤲 ساعة استجابة</h3>
+                            <p class="text-sm opacity-80 leading-relaxed">
+                                "اللهم إنك عفو تحب العفو فاعف عنا"
+                            </p>
+                            <div class="mt-4 p-2 bg-white/20 rounded-lg text-sm">
+                                ⏳ جهز السفرة والماء والتمر
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // SCENARIO 3: NIGHT (Post-Iftar) -> Quran & Water
+            else if (currentPhase === 'night') {
+                msg.innerText = "تقبل الله طاعاتكم";
+                
+                // Quran Calculation
+                const targetPagesPerDay = Math.ceil(604 / 30); // ~20 pages
+                const targetPage = ramadanDay * targetPagesPerDay;
+                const savedPage = parseInt(localStorage.getItem('quranPage')) || 0;
+                const diffPages = savedPage - targetPage;
+                
+                let quranStatus = "";
+                if (diffPages >= 0) quranStatus = `ممتاز! أنت سابق بـ ${diffPages} صفحة`;
+                else quranStatus = `أنت متأخر بـ ${Math.abs(diffPages)} صفحة عن الجدول`;
+
+                // Water Logic
+                const waterCount = parseInt(localStorage.getItem('waterCount')) || 0;
+
+                if(widget.dataset.context !== 'night') {
+                    widget.dataset.context = 'night';
+                    renderNightWidget(savedPage, quranStatus, waterCount);
+                } else {
+                    // Update counters only inside existing widget to avoid redraw
+                    if(document.getElementById('waterCounterDisplay')) 
+                        document.getElementById('waterCounterDisplay').innerText = waterCount;
+                }
+            }
+
+            // SCENARIO 4: MORNING (Fajr to Work)
+            else {
+                msg.innerText = "بداية يوم مبارك";
+                if(widget.dataset.context !== 'morning') {
+                    widget.dataset.context = 'morning';
+                    widget.innerHTML = `
+                         <div class="flex items-center gap-4">
+                            <div class="bg-white/20 p-3 rounded-full">
+                                <i class="fas fa-sun text-2xl text-yellow-300"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold">أذكار الصباح</h3>
+                                <p class="text-xs opacity-70 mt-1">ابدأ يومك بذكر الله لتنال البركة</p>
+                            </div>
+                            <button class="mr-auto bg-white/20 hover:bg-white/40 px-3 py-1 rounded text-sm transition">قراءة</button>
+                        </div>
+                    `;
+                }
+            }
         }
-        function resetData() {
-            if(confirm('تصفير الجدول؟')) { localStorage.removeItem('ramadanly_basel_v3'); location.reload(); }
+
+        function renderNightWidget(savedPage, statusMsg, waterVal) {
+            const widget = document.getElementById('contextWidget');
+            widget.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 border-b border-white/20 pb-3 mb-1">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold"><i class="fas fa-book-open ml-2"></i>الختمة</h3>
+                            <span class="text-xs opacity-70">هدفك اليوم: ص ${Math.ceil(604/30) * 1}</span> 
+                        </div> <div class="flex gap-2">
+                            <input type="number" value="${savedPage}" id="quranInput" onchange="saveQuran(this.value)" class="w-16 bg-white/20 rounded p-1 text-center font-bold focus:outline-none">
+                            <div class="flex-1 flex items-center text-xs opacity-80">
+                                ${statusMsg}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-2 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-glass-water text-blue-300"></i>
+                            <span class="text-sm">تتبع الماء</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-blue-900/30 px-2 py-1 rounded-full">
+                            <button onclick="modWater(-1)" class="w-6 h-6 rounded-full bg-white/10 hover:bg-white/30">-</button>
+                            <span id="waterCounterDisplay" class="font-bold w-4 text-center">${waterVal}</span>
+                            <button onclick="modWater(1)" class="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
-        function exportBackup() {
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schedule));
-            let link = document.createElement('a'); link.href = dataStr; link.download = "backup.json"; link.click();
+
+        // --- Interactive Functions ---
+
+        function toggleFocus() {
+            state.focusMode = !state.focusMode;
+            const btn = document.getElementById('focusBtn');
+            
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (state.focusMode) {
+                btn.classList.add('text-gold', 'opacity-100');
+                btn.classList.remove('opacity-50');
+                
+                // Create Brown Noise (Deep & Calming)
+                const bufferSize = state.audioContext.sampleRate * 2;
+                const buffer = state.audioContext.createBuffer(1, bufferSize, state.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    data[i] = (state.lastOut + (0.02 * white)) / 1.02;
+                    state.lastOut = data[i];
+                    data[i] *= 3.5; 
+                }
+
+                state.whiteNoise = state.audioContext.createBufferSource();
+                state.whiteNoise.buffer = buffer;
+                state.whiteNoise.loop = true;
+                const gain = state.audioContext.createGain();
+                gain.gain.value = 0.08; // Very subtle
+                state.whiteNoise.connect(gain);
+                gain.connect(state.audioContext.destination);
+                state.whiteNoise.start(0);
+                
+                showToast("تم تفعيل وضع التركيز");
+            } else {
+                btn.classList.remove('text-gold', 'opacity-100');
+                btn.classList.add('opacity-50');
+                if (state.whiteNoise) {
+                    state.whiteNoise.stop();
+                    state.whiteNoise.disconnect();
+                }
+            }
         }
-        function importBackup(input) {
-            let reader = new FileReader();
-            reader.onload = (e) => { schedule = JSON.parse(e.target.result); localStorage.setItem('ramadanly_basel_v3', JSON.stringify(schedule)); location.reload(); };
-            reader.readAsText(input.files[0]);
+
+        function togglePrayerGrid() {
+            const grid = document.getElementById('prayerGrid');
+            if (grid.classList.contains('hidden-panel')) {
+                grid.classList.remove('hidden-panel');
+                grid.classList.add('visible-panel');
+            } else {
+                grid.classList.add('hidden-panel');
+                grid.classList.remove('visible-panel');
+            }
         }
+
+        function saveQuran(val) {
+            localStorage.setItem('quranPage', val);
+            // Re-trigger render to update status message
+            const widget = document.getElementById('contextWidget');
+            widget.dataset.context = ''; // Force re-render
+        }
+
+        function modWater(amount) {
+            let current = parseInt(localStorage.getItem('waterCount')) || 0;
+            current += amount;
+            if (current < 0) current = 0;
+            localStorage.setItem('waterCount', current);
+            document.getElementById('waterCounterDisplay').innerText = current;
+        }
+
+        // Helpers
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:false});
+        }
+        function prayerNameAR(name) {
+            const map = {fajr:'الفجر', sunrise:'الشروق', dhuhr:'الظهر', asr:'العصر', maghrib:'المغرب', isha:'العشاء'};
+            return map[name] || name;
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.classList.remove('translate-y-24');
+            setTimeout(() => t.classList.add('translate-y-24'), 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
+
     </script>
 </body>
 </html>
