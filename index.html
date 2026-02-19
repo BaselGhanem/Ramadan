@@ -9,17 +9,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.4/Adhan.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js"></script>
 
     <style>
         :root {
             --bg-dark: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card: rgba(30, 41, 59, 0.6);
             --accent-gold: #fbbf24;
             --accent-blue: #3b82f6;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.15);
             --font-main: 'Tajawal', sans-serif;
         }
 
@@ -29,18 +29,17 @@
             font-family: var(--font-main);
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 20%);
+                radial-gradient(circle at 10% 20%, rgba(251, 191, 36, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 20%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 30px 20px;
         }
 
-        /* خلفية الهلال المتحرك */
         .moon-bg {
             position: fixed;
             top: -100px;
@@ -59,7 +58,6 @@
             100% { transform: translate(50px, 50px); }
         }
 
-        /* الحاوية الرئيسية */
         .dashboard-container {
             width: 100%;
             max-width: 1200px;
@@ -69,111 +67,107 @@
             position: relative;
         }
 
-        /* أنماط البطاقات الزجاجية */
+        /* قسم التحية الشخصية */
+        .greeting-section {
+            grid-column: span 12;
+            text-align: center;
+            margin-bottom: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .greeting-title { font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
+        .encouraging-text { font-size: 1.1rem; color: #cbd5e1; font-weight: 400; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* تصميم بطاقات أبل (Apple Widgets) */
+        .apple-widget {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: var(--glass-border);
+            border-radius: 28px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .apple-widget:hover { transform: scale(1.02); }
+        .widget-title { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 700; }
+        .widget-value { font-size: 1.3rem; font-weight: 900; color: var(--text-primary); }
+        .widget-value.gold { color: var(--accent-gold); }
+
+        .widget-container { grid-column: span 12; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: var(--glass-border);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 24px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        .card:hover { box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4); border-color: rgba(251, 191, 36, 0.3); }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
-            border-color: rgba(251, 191, 36, 0.3);
-        }
-
-        /* --- تقسيمات الـ Dashboard (Desktop) --- */
-        .header-card { grid-column: span 12; display: flex; justify-content: space-between; align-items: center; }
         .main-stat-card { grid-column: span 4; display: flex; flex-direction: column; justify-content: center; text-align: center; }
         .progress-card { grid-column: span 8; display: flex; flex-direction: column; justify-content: space-around; }
-        .work-card { grid-column: span 6; }
+        .ramadan-month-card { grid-column: span 12; }
+        .work-card { grid-column: span 6; display: flex; flex-direction: column; justify-content: center; }
         .prayers-list-card { grid-column: span 6; }
 
-        /* العناوين والنصوص */
-        h1 { font-size: 1.5rem; font-weight: 900; color: var(--accent-gold); }
-        h2 { font-size: 1.2rem; margin-bottom: 15px; color: var(--text-secondary); display: flex; align-items: center; gap: 10px; }
-        .big-number { font-size: 3.5rem; font-weight: 700; line-height: 1; margin: 10px 0; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        h2 { font-size: 1.2rem; margin-bottom: 15px; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .big-number { font-size: 3.5rem; font-weight: 700; line-height: 1; margin: 15px 0; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
         .sub-text { font-size: 0.9rem; color: var(--text-secondary); }
-        .date-display { text-align: left; }
         
-        /* أشرطة التقدم */
-        .progress-container { margin-bottom: 20px; }
+        .progress-container { margin-top: 15px; }
         .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; }
         .progress-bar-bg { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
         
-        .progress-bar-fill { 
-            height: 100%; 
-            border-radius: 10px; 
-            transition: width 1s linear; 
-            position: relative;
-        }
+        .progress-bar-fill { height: 100%; border-radius: 10px; transition: width 1s linear; position: relative; }
+        .fasting-fill { background: linear-gradient(90deg, #1e3a8a 0%, var(--accent-gold) 100%); box-shadow: 0 0 15px var(--accent-gold); }
+        .work-fill { background: linear-gradient(90deg, #059669 0%, #34d399 100%); }
 
-        /* تدرج الصيام: أزرق ليلي -> ذهبي */
-        .fasting-fill {
-            background: linear-gradient(90deg, #1e3a8a 0%, var(--accent-gold) 100%);
-            box-shadow: 0 0 15px var(--accent-gold);
-        }
-
-        /* تدرج العمل: أخضر احترافي */
-        .work-fill {
-            background: linear-gradient(90deg, #059669 0%, #34d399 100%);
-        }
-
-        /* قائمة الصلوات */
         .prayer-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: background 0.3s;
-            border-radius: 8px;
+            display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s; border-radius: 8px;
         }
         .prayer-item:last-child { border-bottom: none; }
-        .prayer-item.active {
-            background: rgba(251, 191, 36, 0.15);
-            border-right: 3px solid var(--accent-gold);
-        }
+        .prayer-item.active { background: rgba(251, 191, 36, 0.15); border-right: 3px solid var(--accent-gold); }
         .prayer-name { font-weight: bold; }
         .prayer-time { font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; }
 
-        /* تأثير الاحتفال */
-        .celebration-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 10;
-            display: none;
+        /* نافذة الإعدادات (Modal) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 100;
         }
+        .modal-content {
+            background: var(--bg-dark); padding: 30px; border-radius: 20px; border: 1px solid var(--accent-gold); width: 90%; max-width: 400px; text-align: center;
+        }
+        .modal-content input {
+            width: 100%; padding: 10px; margin: 10px 0 20px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 1.1rem; text-align: center; font-family: 'Tajawal', monospace;
+        }
+        .modal-content button {
+            background: var(--accent-gold); color: #000; font-weight: bold; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal'; font-size: 1.1rem; width: 100%; transition: 0.2s;
+        }
+        .modal-content button:hover { background: #d97706; }
+        .settings-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
+        .settings-btn:hover { color: var(--accent-gold); transform: rotate(45deg); }
+
+        .celebration-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10; display: none; }
         .confetti { width: 10px; height: 10px; background: gold; position: absolute; animation: fall 3s linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
-        @keyframes fall {
-            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-
-        /* --- استجابة الموبايل (Card-Based) --- */
         @media (max-width: 900px) {
-            .dashboard-container {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-            .header-card, .main-stat-card, .progress-card, .work-card, .prayers-list-card {
-                grid-column: span 12;
-                width: 100%;
-            }
-            .header-card {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }
-            .date-display { text-align: center; }
+            .dashboard-container { display: flex; flex-direction: column; gap: 15px; }
+            .widget-container { grid-template-columns: 1fr; gap: 10px; }
+            .main-stat-card, .progress-card, .ramadan-month-card, .work-card, .prayers-list-card { width: 100%; }
             .big-number { font-size: 2.8rem; }
+            .greeting-title { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -181,75 +175,107 @@
 
     <div class="moon-bg"></div>
 
-    <div class="dashboard-container">
-        <div class="card header-card">
-            <div>
-                <h1>رمضان 2026 <span style="font-size:0.8em; color:var(--text-secondary)">| عمان</span></h1>
-                <div id="hijri-date" class="sub-text" style="color:var(--accent-gold); margin-top:5px;">جاري التحميل...</div>
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="justify-content: center; color: var(--accent-gold); margin-bottom: 20px;">⚙️ الإعدادات الشخصية</h2>
+            <div style="text-align: right;">
+                <label>الاسم:</label>
+                <input type="text" id="user-name-input" value="" placeholder="أدخل اسمك هنا" required>
+
+                <label>وقت بدء الدوام:</label>
+                <input type="time" id="start-time-input" value="07:30" required>
+                
+                <label>وقت نهاية الدوام:</label>
+                <input type="time" id="end-time-input" value="14:30" required>
             </div>
-            <div class="date-display">
-                <div id="gregorian-date" style="font-weight:bold; font-size:1.1rem;">-</div>
-                <div id="days-left" class="sub-text">-</div>
+            <button onclick="saveSettings()">حفظ وإغلاق</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        
+        <div class="greeting-section">
+            <h1 class="greeting-title">أهلاً بك<span id="display-name" style="color: var(--accent-gold);"></span> ✨</h1>
+            <p id="encouraging-message" class="encouraging-text">رمضان مبارك، تقبل الله طاعاتكم</p>
+        </div>
+
+        <div class="widget-container">
+            <div class="apple-widget">
+                <div class="widget-title">التاريخ الهجري</div>
+                <div id="hijri-date" class="widget-value gold">جاري التحميل...</div>
+            </div>
+            <div class="apple-widget">
+                <div class="widget-title">التاريخ الميلادي</div>
+                <div id="gregorian-date" class="widget-value">-</div>
+            </div>
+            <div class="apple-widget">
+                <div class="widget-title">العد التنازلي للعيد</div>
+                <div id="days-left" class="widget-value" style="color: var(--accent-blue);">-</div>
             </div>
         </div>
 
         <div class="card main-stat-card">
-            <h2 style="justify-content: center;">الصلاة القادمة: <span id="next-prayer-name" style="color:var(--text-primary)">-</span></h2>
+            <h2 style="justify-content: center;">الصلاة القادمة: <span id="next-prayer-name" style="color:var(--text-primary); margin-right: 5px;">-</span></h2>
             <div id="countdown" class="big-number">00:00:00</div>
             <div class="sub-text">متبقي للأذان</div>
         </div>
 
         <div class="card progress-card" style="position: relative; overflow: hidden;">
             <div class="celebration-overlay" id="celebration"></div>
-            
             <div class="progress-container">
                 <div class="progress-label">
-                    <span>نسبة إنجاز الصيام</span>
-                    <span id="fasting-percentage" style="color: var(--accent-gold)">0.00%</span>
+                    <span>نسبة إنجاز الصيام اليوم</span>
+                    <span id="fasting-percentage" style="color: var(--accent-gold); font-family: monospace; font-size: 1.1rem;">0.000000%</span>
                 </div>
                 <div class="progress-bar-bg">
                     <div id="fasting-bar" class="progress-bar-fill fasting-fill" style="width: 0%;"></div>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:5px; color:var(--text-secondary)">
-                    <span>الفجر</span>
-                    <span>المغرب</span>
+            </div>
+        </div>
+
+        <div class="card ramadan-month-card">
+            <h2 style="justify-content: center;">🌙 إنجاز شهر رمضان</h2>
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span id="ramadan-days-text">اليوم - من 30</span>
+                    <span id="ramadan-month-percentage" style="color: var(--accent-gold); font-family: monospace; font-size: 1.1rem;">0.00%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="ramadan-month-bar" class="progress-bar-fill fasting-fill" style="width: 0%;"></div>
                 </div>
             </div>
         </div>
 
         <div class="card work-card">
-            <h2>📊 تتبع الدوام</h2>
-            <div id="work-content">
+            <h2>
+                <span>📊 تتبع الدوام</span>
+                <button class="settings-btn" onclick="openSettings()" title="تعديل الإعدادات">⚙️</button>
+            </h2>
+            <div id="work-content" style="text-align: center; margin-top: 10px;">
+                <div id="work-main-display">
+                    <div id="work-countdown" class="big-number" style="color: var(--text-primary); text-shadow: 0 0 20px rgba(5, 150, 105, 0.3);">00:00:00</div>
+                    <div class="sub-text" id="work-status-label">متبقي لنهاية دوامك</div>
+                </div>
+                
                 <div class="progress-container">
                     <div class="progress-label">
-                        <span id="work-status-text">وقت العمل</span>
-                        <span id="work-percentage">0%</span>
+                        <span id="work-status-text">نسبة إنجاز العمل</span>
+                        <span id="work-percentage" style="color: #34d399; font-family: monospace; font-size: 1.1rem;">0.000000%</span>
                     </div>
                     <div class="progress-bar-bg">
                         <div id="work-bar" class="progress-bar-fill work-fill" style="width: 0%;"></div>
                     </div>
                 </div>
-                <div style="text-align: center; margin-top: 10px;" id="work-timer">
-                    متبقي للانتهاء: <span style="font-weight:bold; color:var(--text-primary)">--:--:--</span>
-                </div>
             </div>
         </div>
 
         <div class="card prayers-list-card">
-            <h2>🕌 مواقيت الصلاة اليوم</h2>
-            <div id="prayers-list">
-                </div>
+            <h2 style="justify-content: center;">🕌 مواقيت الصلاة اليوم</h2>
+            <div id="prayers-list"></div>
         </div>
     </div>
 
     <script>
-        // إعدادات الموقع (عمان، الأردن)
-        const coords = new adhan.Coordinates(31.9539, 35.9106);
-        const params = adhan.CalculationMethod.UmmAlQura();
-        // تعديل بسيط لضمان دقة مواقيت الأردن في رمضان
-        params.madhab = adhan.Madhab.Shafi; 
-        
-        // عناصر DOM
         const els = {
             hijri: document.getElementById('hijri-date'),
             gregorian: document.getElementById('gregorian-date'),
@@ -258,59 +284,124 @@
             countdown: document.getElementById('countdown'),
             fastingPercent: document.getElementById('fasting-percentage'),
             fastingBar: document.getElementById('fasting-bar'),
+            ramadanDaysText: document.getElementById('ramadan-days-text'),
+            ramadanMonthPercent: document.getElementById('ramadan-month-percentage'),
+            ramadanMonthBar: document.getElementById('ramadan-month-bar'),
             workContent: document.getElementById('work-content'),
+            workCountdown: document.getElementById('work-countdown'),
+            workStatusLabel: document.getElementById('work-status-label'),
             workPercent: document.getElementById('work-percentage'),
             workBar: document.getElementById('work-bar'),
-            workTimer: document.getElementById('work-timer'),
             prayersList: document.getElementById('prayers-list'),
-            celebration: document.getElementById('celebration')
+            celebration: document.getElementById('celebration'),
+            modal: document.getElementById('settings-modal'),
+            nameInput: document.getElementById('user-name-input'),
+            startInput: document.getElementById('start-time-input'),
+            endInput: document.getElementById('end-time-input'),
+            displayName: document.getElementById('display-name'),
+            encouragingMessage: document.getElementById('encouraging-message')
         };
 
-        const prayerNamesAr = {
-            imsak: 'الإمساك',
-            fajr: 'الفجر',
-            sunrise: 'الشروق',
-            dhuhr: 'الظهر',
-            asr: 'العصر',
-            maghrib: 'المغرب',
-            isha: 'العشاء'
-        };
+        let coords, params;
+        let userNameStr = "";
+        let workStartTimeStr = "07:30";
+        let workEndTimeStr = "14:30";
 
         function init() {
+            // التحقق من وجود البيانات في المتصفح
+            const savedName = localStorage.getItem('ramadanUserName');
+            const savedStart = localStorage.getItem('ramadanWorkStart');
+            const savedEnd = localStorage.getItem('ramadanWorkEnd');
+            
+            if (savedName && savedStart && savedEnd) {
+                // إذا كان المستخدم قد أدخل بياناته مسبقاً
+                userNameStr = savedName;
+                workStartTimeStr = savedStart;
+                workEndTimeStr = savedEnd;
+                els.displayName.innerText = "، " + userNameStr;
+            } else {
+                // إذا كانت هذه الزيارة الأولى
+                els.displayName.innerText = "";
+                openSettings();
+            }
+
+            if (typeof adhan === 'undefined') {
+                els.hijri.innerText = 'خطأ اتصال';
+                return;
+            }
+
+            coords = new adhan.Coordinates(31.9539, 35.9106); // عمان
+            params = adhan.CalculationMethod.MuslimWorldLeague();
+            params.fajrAngle = 18;
+            params.ishaAngle = 18;
+            params.madhab = adhan.Madhab.Shafi;
+
             updateDashboard();
             setInterval(updateTick, 1000);
+        }
+
+        function openSettings() {
+            els.nameInput.value = userNameStr;
+            els.startInput.value = workStartTimeStr;
+            els.endInput.value = workEndTimeStr;
+            els.modal.style.display = 'flex';
+        }
+
+        function saveSettings() {
+            // التأكد من أن المستخدم لم يترك خانة الاسم فارغة
+            if(els.nameInput.value.trim() !== "" && els.startInput.value && els.endInput.value) {
+                userNameStr = els.nameInput.value.trim();
+                workStartTimeStr = els.startInput.value;
+                workEndTimeStr = els.endInput.value;
+                
+                // حفظ البيانات
+                localStorage.setItem('ramadanUserName', userNameStr);
+                localStorage.setItem('ramadanWorkStart', workStartTimeStr);
+                localStorage.setItem('ramadanWorkEnd', workEndTimeStr);
+                
+                // تحديث الواجهة
+                els.displayName.innerText = "، " + userNameStr;
+                els.modal.style.display = 'none';
+                updateTick(); 
+            } else {
+                // تنبيه في حال ترك الخانات فارغة
+                alert("يرجى إدخال اسمك وأوقات الدوام للمتابعة ✨");
+            }
         }
 
         function updateDashboard() {
             const date = new Date();
             const prayerTimes = new adhan.PrayerTimes(coords, date, params);
             
-            // 1. التواريخ
-            const hijriFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' });
-            const gregFormatter = new Intl.DateTimeFormat('ar-JO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const hijriDateCalc = new Date(date.getTime() - (24 * 60 * 60 * 1000));
+            try {
+                const hijriFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' });
+                let formatted = hijriFormatter.format(hijriDateCalc);
+                els.hijri.innerText = formatted.replace('هـ', '').trim();
+            } catch (error) {
+                els.hijri.innerText = "رمضان 1447"; 
+            }
             
-            els.hijri.innerText = hijriFormatter.format(date);
-            els.gregorian.innerText = gregFormatter.format(date);
+            try {
+                const gregFormatter = new Intl.DateTimeFormat('ar-JO', { weekday: 'long', day: 'numeric', month: 'short' });
+                els.gregorian.innerText = gregFormatter.format(date);
+            } catch (error) {
+                els.gregorian.innerText = date.toLocaleDateString('ar-JO');
+            }
             
-            // حساب أيام رمضان المتبقية (تقريبي بناء على تاريخ اليوم)
-            // رمضان 2026 يبدأ تقريباً 17 فبراير.
-            const endRamadan = new Date('2026-03-19'); // تقديري
+            const endRamadan = new Date('2026-03-21');
             const diffTime = Math.abs(endRamadan - date);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            els.daysLeft.innerText = `متبقي للنهاية: ${diffDays} يوم`;
+            els.daysLeft.innerText = `${diffDays} يوم`;
 
-            // 2. قائمة الصلوات
             renderPrayersList(prayerTimes);
         }
 
         function renderPrayersList(times) {
             els.prayersList.innerHTML = '';
-            
-            // إضافة الإمساك يدوياً (قبل الفجر بـ 10 دقائق)
             const imsakTime = new Date(times.fajr.getTime() - 10 * 60000);
             
             const schedule = [
-                { id: 'imsak', name: 'الإمساك', time: imsakTime },
                 { id: 'fajr', name: 'الفجر', time: times.fajr },
                 { id: 'sunrise', name: 'الشروق', time: times.sunrise },
                 { id: 'dhuhr', name: 'الظهر', time: times.dhuhr },
@@ -325,39 +416,54 @@
             schedule.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'prayer-item';
-                
-                // تنسيق الوقت
                 const timeStr = p.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 
-                // تحديد الصلاة القادمة لتمييزها
                 if (!nextPrayerFound && p.time > now && p.id !== 'sunrise') {
                     div.classList.add('active');
                     nextPrayerFound = true;
                     els.nextPrayerName.innerText = p.name;
-                    // تخزين وقت الصلاة القادمة للعداد
                     window.nextPrayerTime = p.time;
                 }
-
                 div.innerHTML = `<span class="prayer-name">${p.name}</span><span class="prayer-time">${timeStr}</span>`;
                 els.prayersList.appendChild(div);
             });
 
-            // إذا انتهت كل الصلوات، القادمة هي إمساك الغد
             if (!nextPrayerFound) {
                 const tomorrow = new Date(now);
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const nextTimes = new adhan.PrayerTimes(coords, tomorrow, params);
-                const nextImsak = new Date(nextTimes.fajr.getTime() - 10 * 60000);
-                els.nextPrayerName.innerText = 'إمساك الغد';
-                window.nextPrayerTime = nextImsak;
+                els.nextPrayerName.innerText = 'فجر الغد';
+                window.nextPrayerTime = nextTimes.fajr;
+            }
+        }
+
+        function updateEncouragement(now, fajr, maghrib) {
+            if (now < fajr) {
+                els.encouragingMessage.innerText = "لا تنسَ نية الصيام وتناول السحور، يبارك الله في يومك 🌙";
+            } else if (now >= fajr && now <= maghrib) {
+                const totalFast = maghrib - fajr;
+                const elapsedFast = now - fajr;
+                const percent = elapsedFast / totalFast;
+                
+                if (percent < 0.3) {
+                    els.encouragingMessage.innerText = "بداية يوم جديد من الأجر، توكل على الله 💪";
+                } else if (percent < 0.7) {
+                    els.encouragingMessage.innerText = "انتصفت رحلة اليوم، الصبر مفتاح الفرج ⏳";
+                } else if (percent < 0.95) {
+                    els.encouragingMessage.innerText = "اقترب الموعد.. جهّز دعواتك التي لا ترد 🤲";
+                } else {
+                    els.encouragingMessage.innerText = "لحظات تفصلنا عن أجر عظيم، تقبل الله صيامك ✨";
+                }
+            } else {
+                els.encouragingMessage.innerText = "صوماً مقبولاً وإفطاراً شهياً، لا تنسنا من دعائك 🍽️";
             }
         }
 
         function updateTick() {
+            if (typeof adhan === 'undefined') return;
             const now = new Date();
             const prayerTimes = new adhan.PrayerTimes(coords, now, params);
 
-            // 1. العداد التنازلي للصلاة القادمة
             if (window.nextPrayerTime) {
                 const diff = window.nextPrayerTime - now;
                 if (diff > 0) {
@@ -367,26 +473,25 @@
                     els.countdown.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
                 } else {
                     els.countdown.innerText = "00:00:00";
-                    updateDashboard(); // تحديث القائمة عند دخول الوقت
+                    updateDashboard(); 
                 }
             }
 
-            // 2. نسبة إنجاز الصيام (من الفجر إلى المغرب)
             const fajr = prayerTimes.fajr;
             const maghrib = prayerTimes.maghrib;
             
+            updateEncouragement(now, fajr, maghrib);
+
             if (now >= fajr && now <= maghrib) {
                 const totalFast = maghrib - fajr;
                 const elapsedFast = now - fajr;
                 const percent = (elapsedFast / totalFast) * 100;
-                
-                els.fastingPercent.innerText = percent.toFixed(2) + '%';
+                els.fastingPercent.innerText = percent.toFixed(6) + '%';
                 els.fastingBar.style.width = percent + '%';
                 els.celebration.style.display = 'none';
             } else if (now > maghrib) {
-                els.fastingPercent.innerText = '100.00%';
+                els.fastingPercent.innerText = '100.000000%';
                 els.fastingBar.style.width = '100%';
-                // عرض الاحتفال لو الوقت قريب من المغرب (أول 15 دقيقة)
                 if (now - maghrib < 15 * 60000) {
                     els.celebration.style.display = 'block';
                     if(els.celebration.innerHTML === '') createConfetti();
@@ -394,51 +499,72 @@
                     els.celebration.style.display = 'none';
                 }
             } else {
-                els.fastingPercent.innerText = '0.00%';
+                els.fastingPercent.innerText = '0.000000%';
                 els.fastingBar.style.width = '0%';
                 els.celebration.style.display = 'none';
             }
 
-            // 3. تتبع الدوام (07:30 - 14:30)
+            const ramadanStart = new Date('2026-02-19T00:00:00'); 
+            let ramadanDay = Math.floor((now - ramadanStart) / (1000 * 60 * 60 * 24)) + 1;
+            if (ramadanDay < 1) ramadanDay = 1;
+            if (ramadanDay > 30) ramadanDay = 30;
+            let monthPercent = (ramadanDay / 30) * 100;
+            els.ramadanDaysText.innerText = `اليوم ${ramadanDay} من 30`;
+            els.ramadanMonthPercent.innerText = monthPercent.toFixed(2) + '%';
+            els.ramadanMonthBar.style.width = monthPercent + '%';
+
             updateWorkTracker(now);
         }
 
         function updateWorkTracker(now) {
-            const day = now.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
-            
-            // عطلة (جمعة أو سبت)
+            const day = now.getDay(); 
             if (day === 5 || day === 6) {
-                els.workContent.innerHTML = `<div style="text-align:center; padding:20px; color:var(--accent-gold); font-size:1.2rem;">✨ عطلة نهاية الأسبوع ✨</div>`;
+                els.workCountdown.innerText = "إجازة";
+                els.workCountdown.style.fontSize = "2.5rem";
+                els.workStatusLabel.innerText = "عطلة نهاية الأسبوع - تقبل الله طاعاتكم";
+                els.workPercent.innerText = "0.000000%";
+                els.workBar.style.width = "0%";
                 return;
             }
 
+            els.workCountdown.style.fontSize = "3.5rem";
+
             const workStart = new Date(now);
-            workStart.setHours(7, 30, 0, 0);
+            const [startH, startM] = workStartTimeStr.split(':');
+            workStart.setHours(parseInt(startH), parseInt(startM), 0, 0);
             
             const workEnd = new Date(now);
-            workEnd.setHours(14, 30, 0, 0);
+            const [endH, endM] = workEndTimeStr.split(':');
+            workEnd.setHours(parseInt(endH), parseInt(endM), 0, 0);
 
             if (now < workStart) {
-                els.workPercent.innerText = '0%';
+                const diff = workStart - now;
+                const h = Math.floor(diff / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                els.workCountdown.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                els.workStatusLabel.innerText = "متبقي لبداية الدوام";
+                els.workPercent.innerText = '0.000000%';
                 els.workBar.style.width = '0%';
-                els.workTimer.innerHTML = 'لم يبدأ الدوام بعد';
             } else if (now >= workStart && now <= workEnd) {
                 const totalWork = workEnd - workStart;
                 const elapsedWork = now - workStart;
                 const percent = (elapsedWork / totalWork) * 100;
                 
-                els.workPercent.innerText = Math.floor(percent) + '%';
+                els.workPercent.innerText = percent.toFixed(6) + '%';
                 els.workBar.style.width = percent + '%';
 
                 const diff = workEnd - now;
                 const h = Math.floor(diff / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-                els.workTimer.innerHTML = `متبقي: <span style="font-weight:bold; color:var(--accent-gold)">${h}:${m}:${s}</span>`;
+                els.workCountdown.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                els.workStatusLabel.innerText = "متبقي لنهاية دوامك";
             } else {
-                els.workPercent.innerText = '100%';
+                els.workCountdown.innerText = "00:00:00";
+                els.workStatusLabel.innerText = "انتهى الدوام! يعطيك العافية";
+                els.workPercent.innerText = '100.000000%';
                 els.workBar.style.width = '100%';
-                els.workTimer.innerHTML = 'انتهى الدوام! تقبل الله طاعاتكم';
             }
         }
 
@@ -453,9 +579,7 @@
             }
         }
 
-        // تشغيل التطبيق
         init();
-
     </script>
 </body>
 </html>
