@@ -3,658 +3,870 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رمضان 2026 - لوحة القيادة | عمان</title>
+    <title>رمضان 2026 - لوحة القيادة التفاعلية</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer></script>
 
     <style>
+        /* * [ARCHITECTURE] Design Tokens
+         * نظام تصميم مبني على المتغيرات لسهولة تغيير الثيم ودعم الـ Dark/Light Mode 
+         */
         :root {
-            --bg-dark: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.6);
+            /* Color Palette */
+            --brand-primary: #099999; /* لون رئيسي مخصص يعكس الهوية */
             --accent-gold: #fbbf24;
             --accent-blue: #3b82f6;
-            --text-primary: #f1f5f9;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            
+            /* Theme: Dark (Default) */
+            --bg-base: #0f172a;
+            --bg-surface: rgba(30, 41, 59, 0.7);
+            --bg-surface-hover: rgba(30, 41, 59, 0.9);
+            --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --glass-border: 1px solid rgba(255, 255, 255, 0.15);
-            --font-main: 'Tajawal', sans-serif;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --shadow-elevation-1: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-elevation-2: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 20px rgba(9, 153, 153, 0.3);
+
+            /* Typography & Motion */
+            --font-main: 'Tajawal', system-ui, sans-serif;
+            --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* [UX] Light Mode Support */
+        [data-theme="light"] {
+            --bg-base: #f1f5f9;
+            --bg-surface: rgba(255, 255, 255, 0.8);
+            --bg-surface-hover: rgba(255, 255, 255, 1);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-glass: rgba(0, 0, 0, 0.05);
+            --shadow-elevation-1: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-elevation-2: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-glow: 0 0 20px rgba(9, 153, 153, 0.15);
+        }
+
+        /* [PERFORMANCE] Reset & Box Sizing */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: var(--font-main);
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(251, 191, 36, 0.08) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 20%);
+            background-color: var(--bg-base);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background-color var(--transition-smooth), color var(--transition-smooth);
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 30px 20px;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* [UI/UX] Visual Depth - Dynamic Ambient Background */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(9, 153, 153, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.05) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .moon-bg {
             position: fixed;
-            top: -100px;
-            left: -100px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, var(--accent-gold) 10%, transparent 60%);
-            opacity: 0.05;
-            filter: blur(80px);
-            animation: floatMoon 20s infinite alternate ease-in-out;
+            top: -50px; left: -50px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
+            opacity: 0.08;
+            filter: blur(40px);
+            animation: floatAmbient 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform; /* [PERFORMANCE] Hardware acceleration hint */
             z-index: -1;
         }
 
-        @keyframes floatMoon {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        @keyframes floatAmbient {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 40px) scale(1.1); }
         }
 
+        /* [ARCHITECTURE] Layout System */
         .dashboard-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1280px;
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 20px;
-            position: relative;
+            gap: 1.5rem;
+            opacity: 0; /* يبدأ مخفياً للـ Entrance Animation */
+            transform: translateY(20px);
         }
 
-        /* قسم التحية الشخصية */
-        .greeting-section {
+        /* Header & Controls */
+        .app-header {
             grid-column: span 12;
-            text-align: center;
-            margin-bottom: 10px;
-            animation: fadeIn 1s ease-in-out;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
-        .greeting-title { font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
-        .encouraging-text { font-size: 1.1rem; color: #cbd5e1; font-weight: 400; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* تصميم بطاقات أبل (Apple Widgets) */
-        .apple-widget {
-            background: var(--bg-card);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: var(--glass-border);
-            border-radius: 28px;
-            padding: 20px;
+        .greeting-section {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
         }
-        .apple-widget:hover { transform: scale(1.02); }
-        .widget-title { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 700; }
-        .widget-value { font-size: 1.3rem; font-weight: 900; color: var(--text-primary); }
-        .widget-value.gold { color: var(--accent-gold); }
 
-        .widget-container { grid-column: span 12; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-
-        .card {
-            background: var(--bg-card);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: var(--glass-border);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .greeting-title { 
+            font-size: clamp(1.8rem, 4vw, 2.5rem); 
+            font-weight: 900; 
+            letter-spacing: -0.5px;
         }
-        .card:hover { box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4); border-color: rgba(251, 191, 36, 0.3); }
 
-        .main-stat-card { grid-column: span 4; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-        .progress-card { grid-column: span 8; display: flex; flex-direction: column; justify-content: space-around; }
-        .ramadan-month-card { grid-column: span 12; }
-        .work-card { grid-column: span 6; display: flex; flex-direction: column; justify-content: center; }
-        .prayers-list-card { grid-column: span 6; }
+        .encouraging-text { 
+            font-size: 1.1rem; 
+            color: var(--text-secondary); 
+            font-weight: 500; 
+        }
+
+        /* [INTERACTION] Theme & Settings Toggles */
+        .controls { display: flex; gap: 10px; }
         
-        /* تصميم قسم التمرينات الجديد */
-        .exercises-card { grid-column: span 12; }
-        .exercises-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .exercise-item {
-            background: rgba(255, 255, 255, 0.03);
-            border-right: 3px solid var(--accent-blue);
-            padding: 15px;
-            border-radius: 12px;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-        .exercise-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-3px);
-            border-right-color: var(--accent-gold);
-        }
-        .exercise-title {
-            color: var(--accent-gold);
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 1.05rem;
-        }
-        .exercise-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        .exercise-desc strong {
+        .icon-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glass);
             color: var(--text-primary);
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all var(--transition-smooth);
+            backdrop-filter: blur(10px);
+        }
+        
+        .icon-btn:hover, .icon-btn:focus-visible {
+            transform: translateY(-2px);
+            background: var(--bg-surface-hover);
+            box-shadow: var(--shadow-elevation-1);
+            outline: none;
+            border-color: var(--brand-primary);
         }
 
-        h2 { font-size: 1.2rem; margin-bottom: 15px; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .big-number { font-size: 3.5rem; font-weight: 700; line-height: 1; margin: 15px 0; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-        .sub-text { font-size: 0.9rem; color: var(--text-secondary); }
-        
-        .progress-container { margin-top: 15px; }
-        .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; }
-        .progress-bar-bg { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        
-        .progress-bar-fill { height: 100%; border-radius: 10px; transition: width 1s linear; position: relative; }
-        .fasting-fill { background: linear-gradient(90deg, #1e3a8a 0%, var(--accent-gold) 100%); box-shadow: 0 0 15px var(--accent-gold); }
-        .work-fill { background: linear-gradient(90deg, #059669 0%, #34d399 100%); }
+        /* [UI/UX] Glassmorphism Cards with Dynamic Hover */
+        .card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-elevation-1);
+            transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            /* [PERFORMANCE] content-visibility لتحسين أداء الرندر للعناصر خارج الشاشة */
+            content-visibility: auto; 
+            contain-intrinsic-size: 200px;
+        }
 
+        /* Micro-interaction: Subtle border glow on hover based on mouse position (JS controlled) */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(9, 153, 153, 0.4), transparent 40%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevation-2); }
+
+        /* Grid Placements */
+        .widget-container { grid-column: span 12; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .main-stat-card { grid-column: span 12; @media(min-width: 992px) { grid-column: span 5; } display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .progress-card { grid-column: span 12; @media(min-width: 992px) { grid-column: span 7; } display: flex; flex-direction: column; justify-content: center; }
+        .ramadan-month-card { grid-column: span 12; }
+        .work-card { grid-column: span 12; @media(min-width: 992px) { grid-column: span 6; } }
+        .prayers-list-card { grid-column: span 12; @media(min-width: 992px) { grid-column: span 6; } }
+        .exercises-card { grid-column: span 12; }
+
+        /* Typography inside cards */
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; width: 100%; }
+        .card-title { font-size: 1.25rem; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .big-number { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; }
+        .gold-text { color: var(--accent-gold); text-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .brand-text { color: var(--brand-primary); text-shadow: 0 0 15px rgba(9, 153, 153, 0.3); }
+
+        /* [UI/UX] Smart Progress Bars */
+        .progress-wrapper { margin-top: 1rem; width: 100%; }
+        .progress-header { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .progress-value { font-family: ui-monospace, monospace; font-weight: 700; }
+        .progress-track { width: 100%; height: 14px; background: rgba(0,0,0,0.1); border-radius: 999px; overflow: hidden; border: 1px inset var(--border-glass); }
+        [data-theme="light"] .progress-track { background: rgba(0,0,0,0.05); }
+        
+        .progress-fill { 
+            height: 100%; 
+            border-radius: 999px; 
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+        }
+        /* Animated gradient background for active state */
+        .fill-fasting { background: linear-gradient(90deg, var(--brand-primary), var(--accent-gold)); background-size: 200% 200%; animation: gradientMove 3s ease infinite; }
+        .fill-work { background: linear-gradient(90deg, #059669, #34d399); }
+        .fill-month { background: linear-gradient(90deg, #6366f1, #a855f7); }
+
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* [UI/UX] Interactive Prayer List */
         .prayer-item {
-            display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s; border-radius: 8px;
+            display: flex; justify-content: space-between; padding: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+            border-radius: 12px; transition: all 0.3s ease;
+            position: relative; overflow: hidden;
         }
         .prayer-item:last-child { border-bottom: none; }
-        .prayer-item.active { background: rgba(251, 191, 36, 0.15); border-right: 3px solid var(--accent-gold); }
-        .prayer-name { font-weight: bold; }
-        .prayer-time { font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; }
+        .prayer-item:hover { background: rgba(255,255,255,0.03); transform: translateX(-5px); }
+        
+        .prayer-item.active {
+            background: rgba(9, 153, 153, 0.1);
+            border-color: transparent;
+            box-shadow: inset -4px 0 0 var(--brand-primary);
+        }
+        /* Interactive State Indicator: Pulse dot for active prayer */
+        .prayer-item.active::before {
+            content: ''; position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            width: 8px; height: 8px; background: var(--brand-primary); border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(9, 153, 153, 0.7); animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(9, 153, 153, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(9, 153, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(9, 153, 153, 0); } }
+        
+        .prayer-name { font-weight: 700; padding-right: 20px; }
+        .prayer-time { font-family: ui-monospace, monospace; font-weight: 600; }
 
-        /* نافذة الإعدادات (Modal) */
+        /* Exercises Grid */
+        .exercises-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .exercise-item {
+            background: rgba(0,0,0,0.1); padding: 1.2rem; border-radius: 16px;
+            border-right: 4px solid var(--text-secondary);
+            transition: all var(--transition-smooth);
+        }
+        [data-theme="light"] .exercise-item { background: rgba(0,0,0,0.02); }
+        .exercise-item:hover { transform: translateY(-3px); border-right-color: var(--brand-primary); background: var(--bg-surface-hover); }
+        .exercise-title { font-weight: 700; color: var(--brand-primary); margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .exercise-desc { font-size: 0.95rem; color: var(--text-secondary); }
+
+        /* [UI/UX] Modern Modal */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            display: none; justify-content: center; align-items: center; z-index: 100;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; visibility: hidden;
+            transition: all var(--transition-smooth);
         }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
         .modal-content {
-            background: var(--bg-dark); padding: 30px; border-radius: 20px; border: 1px solid var(--accent-gold); width: 90%; max-width: 400px; text-align: center;
+            background: var(--bg-base); width: 90%; max-width: 450px;
+            padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-glass);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95) translateY(20px); transition: all var(--transition-bounce);
         }
-        .modal-content input {
-            width: 100%; padding: 10px; margin: 10px 0 20px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 1.1rem; text-align: center; font-family: 'Tajawal', monospace;
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        
+        .form-group { margin-bottom: 1.5rem; text-align: right; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); }
+        .form-control {
+            width: 100%; padding: 0.8rem 1rem; border-radius: 12px;
+            background: var(--bg-surface); border: 2px solid var(--border-glass);
+            color: var(--text-primary); font-family: var(--font-main); font-size: 1rem;
+            transition: all 0.3s ease;
         }
-        .modal-content button {
-            background: var(--accent-gold); color: #000; font-weight: bold; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal'; font-size: 1.1rem; width: 100%; transition: 0.2s;
+        .form-control:focus { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 0 4px rgba(9, 153, 153, 0.1); }
+        
+        .btn-primary {
+            width: 100%; padding: 1rem; border-radius: 12px; border: none;
+            background: var(--brand-primary); color: #fff; font-family: var(--font-main);
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            transition: all var(--transition-bounce);
         }
-        .modal-content button:hover { background: #d97706; }
-        .settings-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
-        .settings-btn:hover { color: var(--accent-gold); transform: rotate(45deg); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); filter: brightness(1.1); }
 
-        .celebration-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10; display: none; }
-        .confetti { width: 10px; height: 10px; background: gold; position: absolute; animation: fall 3s linear infinite; }
-        @keyframes fall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        /* [UX] Smart Toast Notifications (بديل الـ Alert) */
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--bg-surface-hover); color: var(--text-primary); padding: 12px 24px;
+            border-radius: 99px; box-shadow: var(--shadow-elevation-2); border: 1px solid var(--border-glass);
+            font-weight: 500; font-size: 0.95rem;
+            animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @media (max-width: 900px) {
-            .dashboard-container { display: flex; flex-direction: column; gap: 15px; }
-            .widget-container { grid-template-columns: 1fr; gap: 10px; }
-            .main-stat-card, .progress-card, .ramadan-month-card, .work-card, .prayers-list-card, .exercises-card { width: 100%; }
-            .big-number { font-size: 2.8rem; }
-            .greeting-title { font-size: 1.6rem; }
+        /* [UX] Skeleton Loading States */
+        .skeleton { background: linear-gradient(90deg, var(--bg-surface) 25%, var(--border-glass) 50%, var(--bg-surface) 75%); background-size: 400% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; color: transparent !important; user-select: none; }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* [A11Y] Reduced Motion Preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="moon-bg"></div>
+    <div class="ambient-bg" aria-hidden="true"></div>
+    <div class="moon-bg" aria-hidden="true"></div>
 
-    <div id="settings-modal" class="modal-overlay">
+    <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+    <div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-content">
-            <h2 style="justify-content: center; color: var(--accent-gold); margin-bottom: 20px;">⚙️ الإعدادات الشخصية</h2>
-            <div style="text-align: right;">
-                <label>الاسم:</label>
-                <input type="text" id="user-name-input" value="" placeholder="أدخل اسمك هنا" required>
-
-                <label>وقت بدء الدوام:</label>
-                <input type="time" id="start-time-input" value="07:30" required>
-                
-                <label>وقت نهاية الدوام:</label>
-                <input type="time" id="end-time-input" value="14:30" required>
+            <div class="card-header" style="justify-content: center; margin-bottom: 2rem;">
+                <h2 id="modal-title" class="card-title brand-text" style="font-size: 1.5rem;">⚙️ إعدادات التجربة</h2>
             </div>
-            <button onclick="saveSettings()">حفظ وإغلاق</button>
+            <form id="settings-form" novalidate>
+                <div class="form-group">
+                    <label for="user-name-input">الاسم / اللقب</label>
+                    <input type="text" id="user-name-input" class="form-control" placeholder="أدخل اسمك هنا" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="start-time-input">وقت بدء الدوام (نظام 24 ساعة)</label>
+                    <input type="time" id="start-time-input" class="form-control" value="07:30" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="end-time-input">وقت نهاية الدوام</label>
+                    <input type="time" id="end-time-input" class="form-control" value="14:30" required aria-required="true">
+                </div>
+                <button type="submit" class="btn-primary">حفظ وبدء التجربة</button>
+            </form>
         </div>
     </div>
 
-    <div class="dashboard-container">
+    <main class="dashboard-container" id="main-dashboard">
         
-        <div class="greeting-section">
-            <h1 class="greeting-title">أهلاً بك<span id="display-name" style="color: var(--accent-gold);"></span> ✨</h1>
-            <p id="encouraging-message" class="encouraging-text">رمضان مبارك، تقبل الله طاعاتكم</p>
-        </div>
-
-        <div class="widget-container">
-            <div class="apple-widget">
-                <div class="widget-title">التاريخ الهجري</div>
-                <div id="hijri-date" class="widget-value gold">جاري التحميل...</div>
+        <header class="app-header">
+            <div class="greeting-section">
+                <h1 class="greeting-title">أهلاً بك<span id="display-name" class="brand-text"></span> ✨</h1>
+                <p id="encouraging-message" class="encouraging-text skeleton">جاري تحضير البيانات...</p>
             </div>
-            <div class="apple-widget">
-                <div class="widget-title">التاريخ الميلادي</div>
-                <div id="gregorian-date" class="widget-value">-</div>
+            <div class="controls">
+                <button id="theme-toggle" class="icon-btn" aria-label="تبديل المظهر" title="تبديل المظهر">🌙</button>
+                <button id="settings-trigger" class="icon-btn" aria-label="فتح الإعدادات" title="تعديل الإعدادات">⚙️</button>
             </div>
-            <div class="apple-widget">
-                <div class="widget-title">العد التنازلي للعيد</div>
-                <div id="days-left" class="widget-value" style="color: var(--accent-blue);">-</div>
+        </header>
+
+        <section class="widget-container" aria-label="ملخص سريع">
+            <div class="card hover-3d">
+                <div class="card-title" style="font-size:0.9rem; justify-content:center;">التاريخ الهجري</div>
+                <div id="hijri-date" class="big-number gold-text skeleton" style="font-size:1.8rem; margin-top:10px;">تحميل...</div>
             </div>
-        </div>
+            <div class="card hover-3d">
+                <div class="card-title" style="font-size:0.9rem; justify-content:center;">التاريخ الميلادي</div>
+                <div id="gregorian-date" class="big-number skeleton" style="font-size:1.5rem; margin-top:10px;">تحميل...</div>
+            </div>
+            <div class="card hover-3d">
+                <div class="card-title" style="font-size:0.9rem; justify-content:center;">العد التنازلي للعيد</div>
+                <div id="days-left" class="big-number brand-text skeleton" style="font-size:1.8rem; margin-top:10px;">-</div>
+            </div>
+        </section>
 
-        <div class="card main-stat-card">
-            <h2 style="justify-content: center;">الصلاة القادمة: <span id="next-prayer-name" style="color:var(--text-primary); margin-right: 5px;">-</span></h2>
-            <div id="countdown" class="big-number">00:00:00</div>
-            <div class="sub-text">متبقي للأذان</div>
-        </div>
+        <article class="card main-stat-card hover-3d" aria-labelledby="next-prayer-title">
+            <h2 id="next-prayer-title" class="card-title">الصلاة القادمة: <span id="next-prayer-name" class="brand-text skeleton" style="margin-right: 8px;">-</span></h2>
+            <div id="countdown" class="big-number gold-text skeleton" aria-live="timer">00:00:00</div>
+            <p class="encouraging-text" style="margin-top: 5px;">متبقي للأذان</p>
+        </article>
 
-        <div class="card progress-card" style="position: relative; overflow: hidden;">
-            <div class="celebration-overlay" id="celebration"></div>
-            <div class="progress-container">
-                <div class="progress-label">
-                    <span>نسبة إنجاز الصيام اليوم</span>
-                    <span id="fasting-percentage" style="color: var(--accent-gold); font-family: monospace; font-size: 1.1rem;">0.000000%</span>
+        <article class="card progress-card hover-3d">
+            <h2 class="card-title">⏳ رحلة الصيام اليوم</h2>
+            <div class="progress-wrapper">
+                <div class="progress-header">
+                    <span>نسبة الإنجاز</span>
+                    <span id="fasting-percentage" class="progress-value brand-text skeleton">0.00%</span>
                 </div>
-                <div class="progress-bar-bg">
-                    <div id="fasting-bar" class="progress-bar-fill fasting-fill" style="width: 0%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card ramadan-month-card">
-            <h2 style="justify-content: center;">🌙 إنجاز شهر رمضان</h2>
-            <div class="progress-container">
-                <div class="progress-label">
-                    <span id="ramadan-days-text">اليوم - من 30</span>
-                    <span id="ramadan-month-percentage" style="color: var(--accent-gold); font-family: monospace; font-size: 1.1rem;">0.00%</span>
-                </div>
-                <div class="progress-bar-bg">
-                    <div id="ramadan-month-bar" class="progress-bar-fill fasting-fill" style="width: 0%;"></div>
+                <div class="progress-track">
+                    <div id="fasting-bar" class="progress-fill fill-fasting" style="width: 0%;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
-        </div>
+        </article>
 
-        <div class="card work-card">
-            <h2>
-                <span>📊 تتبع الدوام</span>
-                <button class="settings-btn" onclick="openSettings()" title="تعديل الإعدادات">⚙️</button>
-            </h2>
-            <div id="work-content" style="text-align: center; margin-top: 10px;">
-                <div id="work-main-display">
-                    <div id="work-countdown" class="big-number" style="color: var(--text-primary); text-shadow: 0 0 20px rgba(5, 150, 105, 0.3);">00:00:00</div>
-                    <div class="sub-text" id="work-status-label">متبقي لنهاية دوامك</div>
+        <article class="card ramadan-month-card hover-3d">
+            <div class="card-header">
+                <h2 class="card-title">🌙 إنجاز شهر رمضان</h2>
+                <span id="ramadan-days-text" class="text-secondary skeleton">اليوم - من 30</span>
+            </div>
+            <div class="progress-wrapper" style="margin-top:0;">
+                <div class="progress-header">
+                    <span>المسار الكلي</span>
+                    <span id="ramadan-month-percentage" class="progress-value brand-text skeleton">0.00%</span>
                 </div>
-                
-                <div class="progress-container">
-                    <div class="progress-label">
-                        <span id="work-status-text">نسبة إنجاز العمل</span>
-                        <span id="work-percentage" style="color: #34d399; font-family: monospace; font-size: 1.1rem;">0.000000%</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div id="work-bar" class="progress-bar-fill work-fill" style="width: 0%;"></div>
-                    </div>
+                <div class="progress-track">
+                    <div id="ramadan-month-bar" class="progress-fill fill-month" style="width: 0%;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
-        </div>
+        </article>
 
-        <div class="card prayers-list-card">
-            <h2 style="justify-content: center;">🕌 مواقيت الصلاة اليوم</h2>
-            <div id="prayers-list"></div>
-        </div>
+        <article class="card work-card hover-3d">
+            <h2 class="card-title">📊 تتبع الدوام <span style="font-size:0.8rem; font-weight:normal; margin-right:auto; color:var(--text-secondary);" id="work-hours-display"></span></h2>
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <div id="work-countdown" class="big-number skeleton" style="font-size: 3rem; color: var(--success-color);">00:00:00</div>
+                <p id="work-status-label" class="encouraging-text skeleton" style="margin-top: 5px;">الحالة</p>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-header">
+                    <span>نسبة إنجاز العمل</span>
+                    <span id="work-percentage" class="progress-value skeleton" style="color: var(--success-color);">0.00%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="work-bar" class="progress-fill fill-work" style="width: 0%;" role="progressbar"></div>
+                </div>
+            </div>
+        </article>
 
-        <div class="card exercises-card">
-            <h2>
-                <span>⚡ تمرينات مكتبية سريعة لزيادة الإنتاجية واليقظة</span>
-            </h2>
+        <article class="card prayers-list-card hover-3d">
+            <h2 class="card-title">🕌 مواقيت الصلاة اليوم</h2>
+            <div id="prayers-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 8px;">
+                <div class="prayer-item skeleton" style="height: 50px;"></div>
+                <div class="prayer-item skeleton" style="height: 50px;"></div>
+                <div class="prayer-item skeleton" style="height: 50px;"></div>
+            </div>
+        </article>
+
+        <article class="card exercises-card hover-3d">
+            <h2 class="card-title">⚡ تمرينات مكتبية سريعة لزيادة الإنتاجية واليقظة</h2>
             <div class="exercises-grid">
                 <div class="exercise-item">
                     <div class="exercise-title">1. تمديد الرقبة والأكتاف</div>
-                    <div class="exercise-desc">
-                        <strong>الرقبة:</strong> لف رأسك ببطء شديد بشكل دائري، ثم لليمين واليسار.<br>
-                        <strong>الأكتاف:</strong> ارفع أكتافك باتجاه أذنيك، ثبتها لـ 3 ثوانٍ، ثم أرخها ونزلها مرة واحدة. كررها 5 مرات لفك الشد الناتج عن النعاس.
-                    </div>
+                    <div class="exercise-desc">لف رأسك ببطء، وارفع أكتافك لـ 3 ثوانٍ ثم أرخها. كررها لفك الشد الناتج عن النعاس.</div>
                 </div>
                 <div class="exercise-item">
-                    <div class="exercise-title">2. التواء الجذع (وأنت جالس)</div>
-                    <div class="exercise-desc">
-                        حافظ على استقامة ظهرك على الكرسي.<br>لف جذعك لليمين وامسك مسند الكرسي لثوانٍ، ثم كرر الحركة للجهة اليسرى. هذا التمرين ينشط العمود الفقري ويحرك الدورة الدموية.
-                    </div>
+                    <div class="exercise-title">2. التواء الجذع</div>
+                    <div class="exercise-desc">وأنت جالس، لف جذعك لليمين وامسك مسند الكرسي لثوانٍ، ثم لليسار. ينشط الدورة الدموية.</div>
                 </div>
                 <div class="exercise-item">
                     <div class="exercise-title">3. تمديد الساقين</div>
-                    <div class="exercise-desc">
-                        وأنت جالس، ارفع رجليك بشكل مستقيم تحت المكتب.<br>حرك كاحليك (مفصل القدم) بشكل دائري للداخل والخارج 10 مرات. هذه الحركة تساعد في ضخ الدم من الأطراف السفلية لباقي الجسم.
-                    </div>
+                    <div class="exercise-desc">ارفع رجليك بشكل مستقيم، حرك مفصل القدم بشكل دائري 10 مرات لضخ الدم.</div>
                 </div>
                 <div class="exercise-item">
-                    <div class="exercise-title">4. تنفس الأكسجين العميق (4-7-8)</div>
-                    <div class="exercise-desc">
-                        خذ شهيقاً عميقاً من الأنف لمدة 4 ثوانٍ. احبس نَفَسك لمدة 7 ثوانٍ. أخرج الزفير من الفم ببطء لمدة 8 ثوانٍ.<br>يضخ هذا التمرين كمية أكسجين ممتازة للدماغ تساعدك على التركيز واليقظة فوراً.
-                    </div>
-                </div>
-                <div class="exercise-item">
-                    <div class="exercise-title">5. تمرين إراحة العين</div>
-                    <div class="exercise-desc">
-                        النعاس يزداد مع التركيز في الشاشة.<br>أغمض عينيك بقوة لثانيتين ثم افتحها. انظر لشيء بعيد عن مكتبك لمدة 20 ثانية لكسر الإرهاق البصري.
-                    </div>
+                    <div class="exercise-title">4. تنفس (4-7-8)</div>
+                    <div class="exercise-desc">شهيق 4ث، احبس النفس 7ث، زفير بطيء 8ث. يضخ الأكسجين للدماغ للتركيز فوراً.</div>
                 </div>
             </div>
-        </div>
-
-    </div>
+        </article>
+    </main>
 
     <script>
-        const els = {
-            hijri: document.getElementById('hijri-date'),
-            gregorian: document.getElementById('gregorian-date'),
-            daysLeft: document.getElementById('days-left'),
-            nextPrayerName: document.getElementById('next-prayer-name'),
-            countdown: document.getElementById('countdown'),
-            fastingPercent: document.getElementById('fasting-percentage'),
-            fastingBar: document.getElementById('fasting-bar'),
-            ramadanDaysText: document.getElementById('ramadan-days-text'),
-            ramadanMonthPercent: document.getElementById('ramadan-month-percentage'),
-            ramadanMonthBar: document.getElementById('ramadan-month-bar'),
-            workContent: document.getElementById('work-content'),
-            workCountdown: document.getElementById('work-countdown'),
-            workStatusLabel: document.getElementById('work-status-label'),
-            workPercent: document.getElementById('work-percentage'),
-            workBar: document.getElementById('work-bar'),
-            prayersList: document.getElementById('prayers-list'),
-            celebration: document.getElementById('celebration'),
-            modal: document.getElementById('settings-modal'),
-            nameInput: document.getElementById('user-name-input'),
-            startInput: document.getElementById('start-time-input'),
-            endInput: document.getElementById('end-time-input'),
-            displayName: document.getElementById('display-name'),
-            encouragingMessage: document.getElementById('encouraging-message')
-        };
+        /**
+         * [ARCHITECTURE] Revealing Module Pattern
+         * تنظيم الكود في وحدات منطقية لمنع التلوث في الـ Global Scope
+         * وفصل الـ Logic عن الـ UI.
+         */
+        const DashboardApp = (() => {
+            // --- State Management ---
+            const state = {
+                user: { name: '', startWork: '07:30', endWork: '14:30' },
+                theme: 'dark',
+                coords: null,
+                calcParams: null,
+                nextPrayerTime: null,
+                isDataLoaded: false
+            };
 
-        let coords, params;
-        let userNameStr = "";
-        let workStartTimeStr = "07:30";
-        let workEndTimeStr = "14:30";
-
-        function init() {
-            // التحقق من وجود البيانات في المتصفح
-            const savedName = localStorage.getItem('ramadanUserName');
-            const savedStart = localStorage.getItem('ramadanWorkStart');
-            const savedEnd = localStorage.getItem('ramadanWorkEnd');
-            
-            if (savedName && savedStart && savedEnd) {
-                // إذا كان المستخدم قد أدخل بياناته مسبقاً
-                userNameStr = savedName;
-                workStartTimeStr = savedStart;
-                workEndTimeStr = savedEnd;
-                els.displayName.innerText = "، " + userNameStr;
-            } else {
-                // إذا كانت هذه الزيارة الأولى
-                els.displayName.innerText = "";
-                openSettings();
-            }
-
-            if (typeof adhan === 'undefined') {
-                els.hijri.innerText = 'خطأ اتصال';
-                return;
-            }
-
-            coords = new adhan.Coordinates(31.9539, 35.9106); // عمان
-            params = adhan.CalculationMethod.MuslimWorldLeague();
-            params.fajrAngle = 18;
-            params.ishaAngle = 18;
-            params.madhab = adhan.Madhab.Shafi;
-
-            updateDashboard();
-            setInterval(updateTick, 1000);
-        }
-
-        function openSettings() {
-            els.nameInput.value = userNameStr;
-            els.startInput.value = workStartTimeStr;
-            els.endInput.value = workEndTimeStr;
-            els.modal.style.display = 'flex';
-        }
-
-        function saveSettings() {
-            // التأكد من أن المستخدم لم يترك خانة الاسم فارغة
-            if(els.nameInput.value.trim() !== "" && els.startInput.value && els.endInput.value) {
-                userNameStr = els.nameInput.value.trim();
-                workStartTimeStr = els.startInput.value;
-                workEndTimeStr = els.endInput.value;
+            // --- DOM Elements Caching ---
+            const DOM = {
+                app: document.getElementById('main-dashboard'),
+                modal: document.getElementById('settings-modal'),
+                form: document.getElementById('settings-form'),
+                toastContainer: document.getElementById('toast-container'),
+                themeToggle: document.getElementById('theme-toggle'),
+                settingsTrigger: document.getElementById('settings-trigger'),
                 
-                // حفظ البيانات
-                localStorage.setItem('ramadanUserName', userNameStr);
-                localStorage.setItem('ramadanWorkStart', workStartTimeStr);
-                localStorage.setItem('ramadanWorkEnd', workEndTimeStr);
+                // Dynamic Data Elements
+                elements: {
+                    displayName: document.getElementById('display-name'),
+                    msg: document.getElementById('encouraging-message'),
+                    hijri: document.getElementById('hijri-date'),
+                    gregorian: document.getElementById('gregorian-date'),
+                    daysLeft: document.getElementById('days-left'),
+                    nextPrayerName: document.getElementById('next-prayer-name'),
+                    countdown: document.getElementById('countdown'),
+                    fastingPercent: document.getElementById('fasting-percentage'),
+                    fastingBar: document.getElementById('fasting-bar'),
+                    ramadanDays: document.getElementById('ramadan-days-text'),
+                    ramadanMonthPercent: document.getElementById('ramadan-month-percentage'),
+                    ramadanMonthBar: document.getElementById('ramadan-month-bar'),
+                    workHours: document.getElementById('work-hours-display'),
+                    workCountdown: document.getElementById('work-countdown'),
+                    workStatus: document.getElementById('work-status-label'),
+                    workPercent: document.getElementById('work-percentage'),
+                    workBar: document.getElementById('work-bar'),
+                    prayersList: document.getElementById('prayers-list')
+                },
                 
-                // تحديث الواجهة
-                els.displayName.innerText = "، " + userNameStr;
-                els.modal.style.display = 'none';
-                updateTick(); 
-            } else {
-                // تنبيه في حال ترك الخانات فارغة
-                alert("يرجى إدخال اسمك وأوقات الدوام للمتابعة ✨");
-            }
-        }
-
-        function updateDashboard() {
-            const date = new Date();
-            const prayerTimes = new adhan.PrayerTimes(coords, date, params);
-            
-            const hijriDateCalc = new Date(date.getTime() - (24 * 60 * 60 * 1000));
-            try {
-                const hijriFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' });
-                let formatted = hijriFormatter.format(hijriDateCalc);
-                els.hijri.innerText = formatted.replace('هـ', '').trim();
-            } catch (error) {
-                els.hijri.innerText = "رمضان 1447"; 
-            }
-            
-            try {
-                const gregFormatter = new Intl.DateTimeFormat('ar-JO', { weekday: 'long', day: 'numeric', month: 'short' });
-                els.gregorian.innerText = gregFormatter.format(date);
-            } catch (error) {
-                els.gregorian.innerText = date.toLocaleDateString('ar-JO');
-            }
-            
-            const endRamadan = new Date('2026-03-21');
-            const diffTime = Math.abs(endRamadan - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            els.daysLeft.innerText = `${diffDays} يوم`;
-
-            renderPrayersList(prayerTimes);
-        }
-
-        function renderPrayersList(times) {
-            els.prayersList.innerHTML = '';
-            const imsakTime = new Date(times.fajr.getTime() - 10 * 60000);
-            
-            const schedule = [
-                { id: 'fajr', name: 'الفجر', time: times.fajr },
-                { id: 'sunrise', name: 'الشروق', time: times.sunrise },
-                { id: 'dhuhr', name: 'الظهر', time: times.dhuhr },
-                { id: 'asr', name: 'العصر', time: times.asr },
-                { id: 'maghrib', name: 'المغرب', time: times.maghrib },
-                { id: 'isha', name: 'العشاء', time: times.isha },
-            ];
-
-            const now = new Date();
-            let nextPrayerFound = false;
-
-            schedule.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'prayer-item';
-                const timeStr = p.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                
-                if (!nextPrayerFound && p.time > now && p.id !== 'sunrise') {
-                    div.classList.add('active');
-                    nextPrayerFound = true;
-                    els.nextPrayerName.innerText = p.name;
-                    window.nextPrayerTime = p.time;
+                // Inputs
+                inputs: {
+                    name: document.getElementById('user-name-input'),
+                    start: document.getElementById('start-time-input'),
+                    end: document.getElementById('end-time-input')
                 }
-                div.innerHTML = `<span class="prayer-name">${p.name}</span><span class="prayer-time">${timeStr}</span>`;
-                els.prayersList.appendChild(div);
-            });
+            };
 
-            if (!nextPrayerFound) {
-                const tomorrow = new Date(now);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const nextTimes = new adhan.PrayerTimes(coords, tomorrow, params);
-                els.nextPrayerName.innerText = 'فجر الغد';
-                window.nextPrayerTime = nextTimes.fajr;
-            }
-        }
-
-        function updateEncouragement(now, fajr, maghrib) {
-            if (now < fajr) {
-                els.encouragingMessage.innerText = "لا تنسَ نية الصيام وتناول السحور، يبارك الله في يومك 🌙";
-            } else if (now >= fajr && now <= maghrib) {
-                const totalFast = maghrib - fajr;
-                const elapsedFast = now - fajr;
-                const percent = elapsedFast / totalFast;
+            // --- Utility Functions ---
+            const Utils = {
+                showToast: (message, type = 'info') => {
+                    const toast = document.createElement('div');
+                    toast.className = 'toast';
+                    toast.textContent = message;
+                    if(type === 'error') toast.style.borderLeft = '4px solid var(--danger-color)';
+                    if(type === 'success') toast.style.borderLeft = '4px solid var(--success-color)';
+                    
+                    DOM.toastContainer.appendChild(toast);
+                    setTimeout(() => {
+                        toast.style.animation = 'slideUpFade 0.4s reverse forwards';
+                        setTimeout(() => toast.remove(), 400);
+                    }, 3000);
+                },
                 
-                if (percent < 0.3) {
-                    els.encouragingMessage.innerText = "بداية يوم جديد من الأجر، توكل على الله 💪";
-                } else if (percent < 0.7) {
-                    els.encouragingMessage.innerText = "انتصفت رحلة اليوم، الصبر مفتاح الفرج ⏳";
-                } else if (percent < 0.95) {
-                    els.encouragingMessage.innerText = "اقترب الموعد.. جهّز دعواتك التي لا ترد 🤲";
-                } else {
-                    els.encouragingMessage.innerText = "لحظات تفصلنا عن أجر عظيم، تقبل الله صيامك ✨";
+                formatTimeDiff: (diffMs) => {
+                    if (diffMs <= 0) return "00:00:00";
+                    const h = Math.floor(diffMs / 3600000).toString().padStart(2, '0');
+                    const m = Math.floor((diffMs % 3600000) / 60000).toString().padStart(2, '0');
+                    const s = Math.floor((diffMs % 60000) / 1000).toString().padStart(2, '0');
+                    return `${h}:${m}:${s}`;
+                },
+
+                escapeHTML: (str) => {
+                    // [SECURITY] XSS Prevention
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                },
+
+                removeSkeletons: () => {
+                    document.querySelectorAll('.skeleton').forEach(el => el.classList.remove('skeleton'));
+                    state.isDataLoaded = true;
                 }
-            } else {
-                els.encouragingMessage.innerText = "صوماً مقبولاً وإفطاراً شهياً، لا تنسنا من دعائك 🍽️";
-            }
-        }
+            };
 
-        function updateTick() {
-            if (typeof adhan === 'undefined') return;
-            const now = new Date();
-            const prayerTimes = new adhan.PrayerTimes(coords, now, params);
+            // --- Core Logic ---
+            const Logic = {
+                initAdhan: () => {
+                    if (typeof adhan === 'undefined') {
+                        Utils.showToast('تعذر تحميل مكتبة المواقيت، يرجى التحقق من الاتصال', 'error');
+                        return false;
+                    }
+                    // عمان - [HARDCODED CONFIG BASED ON ORIGINAL]
+                    state.coords = new adhan.Coordinates(31.9539, 35.9106); 
+                    state.calcParams = adhan.CalculationMethod.MuslimWorldLeague();
+                    state.calcParams.fajrAngle = 18;
+                    state.calcParams.ishaAngle = 18;
+                    state.calcParams.madhab = adhan.Madhab.Shafi;
+                    return true;
+                },
 
-            if (window.nextPrayerTime) {
-                const diff = window.nextPrayerTime - now;
-                if (diff > 0) {
-                    const h = Math.floor(diff / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    els.countdown.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                } else {
-                    els.countdown.innerText = "00:00:00";
-                    updateDashboard(); 
+                updateStaticData: () => {
+                    const now = new Date();
+                    
+                    // Hijri Calculation (Robust fallback)
+                    try {
+                        const hijriCalc = new Date(now.getTime() - 86400000);
+                        const formatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' });
+                        DOM.elements.hijri.textContent = formatter.format(hijriCalc).replace('هـ', '').trim();
+                    } catch (e) { DOM.elements.hijri.textContent = "رمضان 1447"; }
+
+                    // Gregorian
+                    try {
+                        const gregFormatter = new Intl.DateTimeFormat('ar-JO', { weekday: 'long', day: 'numeric', month: 'short' });
+                        DOM.elements.gregorian.textContent = gregFormatter.format(now);
+                    } catch (e) { DOM.elements.gregorian.textContent = now.toLocaleDateString('ar-JO'); }
+
+                    // Eid Countdown
+                    const endRamadan = new Date('2026-03-21T00:00:00');
+                    const diffDays = Math.ceil((endRamadan - now) / 86400000);
+                    DOM.elements.daysLeft.textContent = diffDays > 0 ? `${diffDays} يوم` : 'عيد سعيد!';
+
+                    // Ramadan Month Progress
+                    const ramadanStart = new Date('2026-02-19T00:00:00'); 
+                    let rDay = Math.floor((now - ramadanStart) / 86400000) + 1;
+                    rDay = Math.max(1, Math.min(rDay, 30));
+                    const mPercent = (rDay / 30) * 100;
+                    
+                    DOM.elements.ramadanDays.textContent = `اليوم ${rDay} من 30`;
+                    DOM.elements.ramadanMonthPercent.textContent = mPercent.toFixed(1) + '%';
+                    DOM.elements.ramadanMonthBar.style.width = mPercent + '%';
+                    DOM.elements.ramadanMonthBar.setAttribute('aria-valuenow', mPercent);
+                },
+
+                renderPrayers: (prayerTimes) => {
+                    DOM.elements.prayersList.innerHTML = '';
+                    const schedule = [
+                        { id: 'fajr', name: 'الفجر', time: prayerTimes.fajr },
+                        { id: 'sunrise', name: 'الشروق', time: prayerTimes.sunrise },
+                        { id: 'dhuhr', name: 'الظهر', time: prayerTimes.dhuhr },
+                        { id: 'asr', name: 'العصر', time: prayerTimes.asr },
+                        { id: 'maghrib', name: 'المغرب', time: prayerTimes.maghrib },
+                        { id: 'isha', name: 'العشاء', time: prayerTimes.isha },
+                    ];
+
+                    const now = new Date();
+                    let nextFound = false;
+
+                    schedule.forEach(p => {
+                        const div = document.createElement('div');
+                        div.className = 'prayer-item';
+                        const timeStr = p.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                        
+                        // Highlight next prayer (skip sunrise for active target)
+                        if (!nextFound && p.time > now && p.id !== 'sunrise') {
+                            div.classList.add('active');
+                            nextFound = true;
+                            DOM.elements.nextPrayerName.textContent = p.name;
+                            state.nextPrayerTime = p.time;
+                        }
+                        
+                        div.innerHTML = `<span class="prayer-name">${p.name}</span><span class="prayer-time">${timeStr}</span>`;
+                        DOM.elements.prayersList.appendChild(div);
+                    });
+
+                    // Handle cross-day (after Isha)
+                    if (!nextFound) {
+                        const tomorrow = new Date(now.getTime() + 86400000);
+                        const nextTimes = new adhan.PrayerTimes(state.coords, tomorrow, state.calcParams);
+                        DOM.elements.nextPrayerName.textContent = 'فجر الغد';
+                        state.nextPrayerTime = nextTimes.fajr;
+                    }
+                },
+
+                tick: () => {
+                    if (!state.isDataLoaded) return;
+                    const now = new Date();
+                    const pt = new adhan.PrayerTimes(state.coords, now, state.calcParams);
+
+                    // 1. Next Prayer Countdown
+                    if (state.nextPrayerTime) {
+                        const diff = state.nextPrayerTime - now;
+                        if (diff > 0) {
+                            DOM.elements.countdown.textContent = Utils.formatTimeDiff(diff);
+                        } else {
+                            // Re-render prayers when time hits
+                            Logic.renderPrayers(pt);
+                            // Analytics Hook Trigger
+                            document.dispatchEvent(new CustomEvent('app:prayerTimeHit', { detail: { time: now } }));
+                        }
+                    }
+
+                    // 2. Fasting Progress & Encouragement
+                    const f = pt.fajr, m = pt.maghrib;
+                    if (now < f) {
+                        DOM.elements.msg.textContent = "لا تنسَ نية الصيام وتناول السحور، يبارك الله في يومك 🌙";
+                        DOM.elements.fastingPercent.textContent = '0.00%';
+                        DOM.elements.fastingBar.style.width = '0%';
+                    } else if (now >= f && now <= m) {
+                        const total = m - f, elapsed = now - f;
+                        const p = (elapsed / total);
+                        
+                        DOM.elements.fastingPercent.textContent = (p * 100).toFixed(4) + '%';
+                        DOM.elements.fastingBar.style.width = (p * 100) + '%';
+                        
+                        if (p < 0.3) DOM.elements.msg.textContent = "بداية يوم جديد من الأجر، توكل على الله 💪";
+                        else if (p < 0.7) DOM.elements.msg.textContent = "انتصفت رحلة اليوم، الصبر مفتاح الفرج ⏳";
+                        else if (p < 0.95) DOM.elements.msg.textContent = "اقترب الموعد.. جهّز دعواتك التي لا ترد 🤲";
+                        else DOM.elements.msg.textContent = "لحظات تفصلنا عن أجر عظيم، تقبل الله صيامك ✨";
+                    } else {
+                        DOM.elements.msg.textContent = "صوماً مقبولاً وإفطاراً شهياً، لا تنسنا من دعائك 🍽️";
+                        DOM.elements.fastingPercent.textContent = '100.00%';
+                        DOM.elements.fastingBar.style.width = '100%';
+                    }
+
+                    // 3. Work Tracker
+                    const day = now.getDay();
+                    if (day === 5 || day === 6) { // Fri/Sat
+                        DOM.elements.workCountdown.textContent = "إجازة";
+                        DOM.elements.workStatus.textContent = "عطلة نهاية الأسبوع - تقبل الله طاعاتكم";
+                        DOM.elements.workPercent.textContent = "0.00%";
+                        DOM.elements.workBar.style.width = "0%";
+                    } else {
+                        const [sH, sM] = state.user.startWork.split(':');
+                        const [eH, eM] = state.user.endWork.split(':');
+                        
+                        const wStart = new Date(now).setHours(sH, sM, 0, 0);
+                        const wEnd = new Date(now).setHours(eH, eM, 0, 0);
+
+                        if (now < wStart) {
+                            DOM.elements.workCountdown.textContent = Utils.formatTimeDiff(wStart - now);
+                            DOM.elements.workStatus.textContent = "متبقي لبداية الدوام";
+                            DOM.elements.workPercent.textContent = '0.00%';
+                            DOM.elements.workBar.style.width = '0%';
+                        } else if (now >= wStart && now <= wEnd) {
+                            const p = ((now - wStart) / (wEnd - wStart)) * 100;
+                            DOM.elements.workCountdown.textContent = Utils.formatTimeDiff(wEnd - now);
+                            DOM.elements.workStatus.textContent = "متبقي لنهاية دوامك";
+                            DOM.elements.workPercent.textContent = p.toFixed(4) + '%';
+                            DOM.elements.workBar.style.width = p + '%';
+                        } else {
+                            DOM.elements.workCountdown.textContent = "00:00:00";
+                            DOM.elements.workStatus.textContent = "انتهى الدوام! يعطيك العافية";
+                            DOM.elements.workPercent.textContent = '100.00%';
+                            DOM.elements.workBar.style.width = '100%';
+                        }
+                    }
+
+                    // Request Next Frame for smooth performance instead of setInterval
+                    requestAnimationFrame(Logic.tick);
                 }
-            }
+            };
 
-            const fajr = prayerTimes.fajr;
-            const maghrib = prayerTimes.maghrib;
-            
-            updateEncouragement(now, fajr, maghrib);
+            // --- UI/Interaction Logic ---
+            const UI = {
+                initTheme: () => {
+                    // Check local storage or system preference
+                    const saved = localStorage.getItem('ramadan_theme');
+                    const sysPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+                    state.theme = saved ? saved : (sysPrefersLight ? 'light' : 'dark');
+                    UI.applyTheme();
+                    
+                    DOM.themeToggle.addEventListener('click', () => {
+                        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+                        localStorage.setItem('ramadan_theme', state.theme);
+                        UI.applyTheme();
+                    });
+                },
 
-            if (now >= fajr && now <= maghrib) {
-                const totalFast = maghrib - fajr;
-                const elapsedFast = now - fajr;
-                const percent = (elapsedFast / totalFast) * 100;
-                els.fastingPercent.innerText = percent.toFixed(6) + '%';
-                els.fastingBar.style.width = percent + '%';
-                els.celebration.style.display = 'none';
-            } else if (now > maghrib) {
-                els.fastingPercent.innerText = '100.000000%';
-                els.fastingBar.style.width = '100%';
-                if (now - maghrib < 15 * 60000) {
-                    els.celebration.style.display = 'block';
-                    if(els.celebration.innerHTML === '') createConfetti();
-                } else {
-                    els.celebration.style.display = 'none';
+                applyTheme: () => {
+                    document.documentElement.setAttribute('data-theme', state.theme);
+                    DOM.themeToggle.textContent = state.theme === 'dark' ? '☀️' : '🌙';
+                    DOM.themeToggle.setAttribute('aria-label', state.theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن');
+                },
+
+                initInteractions: () => {
+                    // [UX] Staggered Entrance Animation
+                    setTimeout(() => {
+                        DOM.app.style.transition = 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                        DOM.app.style.opacity = '1';
+                        DOM.app.style.transform = 'translateY(0)';
+                    }, 100);
+
+                    // [UI] Dynamic Hover Physics for Cards (3D Tilt Effect Simulation)
+                    document.querySelectorAll('.hover-3d').forEach(card => {
+                        card.addEventListener('mousemove', e => {
+                            const rect = card.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            card.style.setProperty('--mouse-x', `${x}px`);
+                            card.style.setProperty('--mouse-y', `${y}px`);
+                        });
+                    });
+                },
+
+                handleSettings: () => {
+                    const saved = localStorage.getItem('ramadan_user');
+                    if (saved) {
+                        try {
+                            state.user = JSON.parse(saved);
+                            UI.applyUserData();
+                            UI.startAppFlow();
+                        } catch(e) { UI.openModal(); }
+                    } else {
+                        UI.openModal();
+                    }
+
+                    DOM.settingsTrigger.addEventListener('click', UI.openModal);
+                    
+                    DOM.form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const name = Utils.escapeHTML(DOM.inputs.name.value.trim());
+                        if(!name) {
+                            Utils.showToast('يرجى إدخال الاسم', 'error');
+                            DOM.inputs.name.focus();
+                            return;
+                        }
+                        
+                        state.user = {
+                            name: name,
+                            startWork: DOM.inputs.start.value,
+                            endWork: DOM.inputs.end.value
+                        };
+                        
+                        localStorage.setItem('ramadan_user', JSON.stringify(state.user));
+                        UI.applyUserData();
+                        UI.closeModal();
+                        Utils.showToast('تم حفظ الإعدادات بنجاح', 'success');
+                        
+                        if(!state.isDataLoaded) UI.startAppFlow();
+                    });
+                },
+
+                applyUserData: () => {
+                    DOM.elements.displayName.textContent = `، ${state.user.name}`;
+                    DOM.elements.workHours.textContent = `(${state.user.startWork} - ${state.user.endWork})`;
+                    DOM.inputs.name.value = state.user.name;
+                    DOM.inputs.start.value = state.user.startWork;
+                    DOM.inputs.end.value = state.user.endWork;
+                },
+
+                openModal: () => {
+                    DOM.modal.classList.add('active');
+                    DOM.modal.setAttribute('aria-hidden', 'false');
+                    setTimeout(() => DOM.inputs.name.focus(), 300); // Focus for A11y
+                },
+
+                closeModal: () => {
+                    DOM.modal.classList.remove('active');
+                    DOM.modal.setAttribute('aria-hidden', 'true');
+                },
+
+                startAppFlow: () => {
+                    // Check if adhan loaded
+                    let attempts = 0;
+                    const checkAdhan = setInterval(() => {
+                        if (Logic.initAdhan()) {
+                            clearInterval(checkAdhan);
+                            Logic.updateStaticData();
+                            const pt = new adhan.PrayerTimes(state.coords, new Date(), state.calcParams);
+                            Logic.renderPrayers(pt);
+                            Utils.removeSkeletons();
+                            requestAnimationFrame(Logic.tick); // Start High Performance loop
+                        } else {
+                            attempts++;
+                            if(attempts > 5) {
+                                clearInterval(checkAdhan);
+                                DOM.elements.msg.textContent = "حدث خطأ في تحميل البيانات.";
+                            }
+                        }
+                    }, 500);
                 }
-            } else {
-                els.fastingPercent.innerText = '0.000000%';
-                els.fastingBar.style.width = '0%';
-                els.celebration.style.display = 'none';
-            }
+            };
 
-            const ramadanStart = new Date('2026-02-19T00:00:00'); 
-            let ramadanDay = Math.floor((now - ramadanStart) / (1000 * 60 * 60 * 24)) + 1;
-            if (ramadanDay < 1) ramadanDay = 1;
-            if (ramadanDay > 30) ramadanDay = 30;
-            let monthPercent = (ramadanDay / 30) * 100;
-            els.ramadanDaysText.innerText = `اليوم ${ramadanDay} من 30`;
-            els.ramadanMonthPercent.innerText = monthPercent.toFixed(2) + '%';
-            els.ramadanMonthBar.style.width = monthPercent + '%';
+            // --- Public API ---
+            return {
+                init: () => {
+                    UI.initTheme();
+                    UI.initInteractions();
+                    UI.handleSettings();
+                    // Analytics Hooks Base
+                    document.addEventListener('app:prayerTimeHit', (e) => console.log('Analytics Event: Prayer Time Reached', e.detail));
+                }
+            };
+        })();
 
-            updateWorkTracker(now);
-        }
-
-        function updateWorkTracker(now) {
-            const day = now.getDay(); 
-            if (day === 5 || day === 6) {
-                els.workCountdown.innerText = "إجازة";
-                els.workCountdown.style.fontSize = "2.5rem";
-                els.workStatusLabel.innerText = "عطلة نهاية الأسبوع - تقبل الله طاعاتكم";
-                els.workPercent.innerText = "0.000000%";
-                els.workBar.style.width = "0%";
-                return;
-            }
-
-            els.workCountdown.style.fontSize = "3.5rem";
-
-            const workStart = new Date(now);
-            const [startH, startM] = workStartTimeStr.split(':');
-            workStart.setHours(parseInt(startH), parseInt(startM), 0, 0);
-            
-            const workEnd = new Date(now);
-            const [endH, endM] = workEndTimeStr.split(':');
-            workEnd.setHours(parseInt(endH), parseInt(endM), 0, 0);
-
-            if (now < workStart) {
-                const diff = workStart - now;
-                const h = Math.floor(diff / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                els.workCountdown.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                els.workStatusLabel.innerText = "متبقي لبداية الدوام";
-                els.workPercent.innerText = '0.000000%';
-                els.workBar.style.width = '0%';
-            } else if (now >= workStart && now <= workEnd) {
-                const totalWork = workEnd - workStart;
-                const elapsedWork = now - workStart;
-                const percent = (elapsedWork / totalWork) * 100;
-                
-                els.workPercent.innerText = percent.toFixed(6) + '%';
-                els.workBar.style.width = percent + '%';
-
-                const diff = workEnd - now;
-                const h = Math.floor(diff / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                els.workCountdown.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                els.workStatusLabel.innerText = "متبقي لنهاية دوامك";
-            } else {
-                els.workCountdown.innerText = "00:00:00";
-                els.workStatusLabel.innerText = "انتهى الدوام! يعطيك العافية";
-                els.workPercent.innerText = '100.000000%';
-                els.workBar.style.width = '100%';
-            }
-        }
-
-        function createConfetti() {
-            for(let i=0; i<50; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                confetti.style.backgroundColor = ['#fbbf24', '#3b82f6', '#ffffff'][Math.floor(Math.random()*3)];
-                els.celebration.appendChild(confetti);
-            }
-        }
-
-        init();
+        // Boot the App
+        document.addEventListener('DOMContentLoaded', DashboardApp.init);
     </script>
 </body>
 </html>
