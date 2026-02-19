@@ -119,6 +119,41 @@
         .ramadan-month-card { grid-column: span 12; }
         .work-card { grid-column: span 6; display: flex; flex-direction: column; justify-content: center; }
         .prayers-list-card { grid-column: span 6; }
+        
+        /* تصميم قسم التمرينات الجديد */
+        .exercises-card { grid-column: span 12; }
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .exercise-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-right: 3px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 12px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        .exercise-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+            border-right-color: var(--accent-gold);
+        }
+        .exercise-title {
+            color: var(--accent-gold);
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+        }
+        .exercise-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .exercise-desc strong {
+            color: var(--text-primary);
+        }
 
         h2 { font-size: 1.2rem; margin-bottom: 15px; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .big-number { font-size: 3.5rem; font-weight: 700; line-height: 1; margin: 15px 0; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
@@ -165,7 +200,7 @@
         @media (max-width: 900px) {
             .dashboard-container { display: flex; flex-direction: column; gap: 15px; }
             .widget-container { grid-template-columns: 1fr; gap: 10px; }
-            .main-stat-card, .progress-card, .ramadan-month-card, .work-card, .prayers-list-card { width: 100%; }
+            .main-stat-card, .progress-card, .ramadan-month-card, .work-card, .prayers-list-card, .exercises-card { width: 100%; }
             .big-number { font-size: 2.8rem; }
             .greeting-title { font-size: 1.6rem; }
         }
@@ -273,6 +308,46 @@
             <h2 style="justify-content: center;">🕌 مواقيت الصلاة اليوم</h2>
             <div id="prayers-list"></div>
         </div>
+
+        <div class="card exercises-card">
+            <h2>
+                <span>⚡ تمرينات مكتبية سريعة لزيادة الإنتاجية واليقظة</span>
+            </h2>
+            <div class="exercises-grid">
+                <div class="exercise-item">
+                    <div class="exercise-title">1. تمديد الرقبة والأكتاف</div>
+                    <div class="exercise-desc">
+                        <strong>الرقبة:</strong> لف رأسك ببطء شديد بشكل دائري، ثم لليمين واليسار.<br>
+                        <strong>الأكتاف:</strong> ارفع أكتافك باتجاه أذنيك، ثبتها لـ 3 ثوانٍ، ثم أرخها ونزلها مرة واحدة. كررها 5 مرات لفك الشد الناتج عن النعاس.
+                    </div>
+                </div>
+                <div class="exercise-item">
+                    <div class="exercise-title">2. التواء الجذع (وأنت جالس)</div>
+                    <div class="exercise-desc">
+                        حافظ على استقامة ظهرك على الكرسي.<br>لف جذعك لليمين وامسك مسند الكرسي لثوانٍ، ثم كرر الحركة للجهة اليسرى. هذا التمرين ينشط العمود الفقري ويحرك الدورة الدموية.
+                    </div>
+                </div>
+                <div class="exercise-item">
+                    <div class="exercise-title">3. تمديد الساقين</div>
+                    <div class="exercise-desc">
+                        وأنت جالس، ارفع رجليك بشكل مستقيم تحت المكتب.<br>حرك كاحليك (مفصل القدم) بشكل دائري للداخل والخارج 10 مرات. هذه الحركة تساعد في ضخ الدم من الأطراف السفلية لباقي الجسم.
+                    </div>
+                </div>
+                <div class="exercise-item">
+                    <div class="exercise-title">4. تنفس الأكسجين العميق (4-7-8)</div>
+                    <div class="exercise-desc">
+                        خذ شهيقاً عميقاً من الأنف لمدة 4 ثوانٍ. احبس نَفَسك لمدة 7 ثوانٍ. أخرج الزفير من الفم ببطء لمدة 8 ثوانٍ.<br>يضخ هذا التمرين كمية أكسجين ممتازة للدماغ تساعدك على التركيز واليقظة فوراً.
+                    </div>
+                </div>
+                <div class="exercise-item">
+                    <div class="exercise-title">5. تمرين إراحة العين</div>
+                    <div class="exercise-desc">
+                        النعاس يزداد مع التركيز في الشاشة.<br>أغمض عينيك بقوة لثانيتين ثم افتحها. انظر لشيء بعيد عن مكتبك لمدة 20 ثانية لكسر الإرهاق البصري.
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
